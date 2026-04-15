@@ -1,18 +1,16 @@
-pub fn demo_help_text(page: &str) -> Option<(&'static str, &'static str)> {
-    Some(
-        demo_help_core_pages(page)
-            .or_else(|| demo_help_admin_pages(page))
-            .or_else(|| demo_help_governance_pages(page))
-            .or_else(|| demo_help_analytics_pages(page))
-            .or_else(|| demo_help_infra_pages(page))
-            .or_else(|| demo_help_entity_edit_pages(page))
-            .or_else(|| demo_help_user_pages(page))
-            .or_else(|| demo_help_misc_pages(page))
-            .unwrap_or((
-                "This page is part of the <strong>Enterprise Demo</strong>. It exercises one slice of the governance, analytics, or workspace pipeline end-to-end so you can see how the platform behaves in production. Data shown here is real telemetry from the running stack &mdash; connect via <strong>Claude Code</strong> to populate it with your own sessions. Claude Code is the recommended integration while Cowork (research preview) stabilises.",
-                "dashboard",
-            )),
-    )
+pub fn demo_help_text(page: &str) -> (&'static str, &'static str) {
+    demo_help_core_pages(page)
+        .or_else(|| demo_help_admin_pages(page))
+        .or_else(|| demo_help_governance_pages(page))
+        .or_else(|| demo_help_analytics_pages(page))
+        .or_else(|| demo_help_infra_pages(page))
+        .or_else(|| demo_help_entity_edit_pages(page))
+        .or_else(|| demo_help_user_pages(page))
+        .or_else(|| demo_help_misc_pages(page))
+        .unwrap_or((
+            "This page is part of the <strong>Enterprise Demo</strong>. It exercises one slice of the governance, analytics, or workspace pipeline end-to-end so you can see how the platform behaves in production. Data shown here is real telemetry from the running stack &mdash; connect via <strong>Claude Code</strong> to populate it with your own sessions. Claude Code is the recommended integration while Cowork (research preview) stabilises.",
+            "dashboard",
+        ))
 }
 
 fn demo_help_core_pages(page: &str) -> Option<(&'static str, &'static str)> {

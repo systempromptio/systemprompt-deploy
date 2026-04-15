@@ -117,15 +117,6 @@ fn evaluate_scope(
         return;
     }
 
-    if ctx.agent_scope == SCOPE_UNKNOWN {
-        rules.push(EvaluatedRule {
-            rule: "scope_check",
-            result: "warn",
-            detail: Cow::Borrowed("Agent scope could not be resolved, treating as restricted"),
-        });
-        return;
-    }
-
     let requires_admin = ADMIN_ONLY_TOOL_PREFIXES
         .iter()
         .any(|prefix| ctx.tool_name.starts_with(prefix));
@@ -144,6 +135,14 @@ fn evaluate_scope(
                 "{} scope cannot access tools matching admin-only prefixes",
                 ctx.agent_scope
             )),
+        });
+    } else if ctx.agent_scope == SCOPE_UNKNOWN {
+        rules.push(EvaluatedRule {
+            rule: "scope_check",
+            result: "warn",
+            detail: Cow::Borrowed(
+                "Agent scope could not be resolved; allowed for non-admin tool",
+            ),
         });
     } else {
         rules.push(EvaluatedRule {

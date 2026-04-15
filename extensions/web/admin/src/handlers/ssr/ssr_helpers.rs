@@ -81,13 +81,12 @@ fn inject_user_and_marketplace(
         }
     }
     if let Some(page_str) = obj.get("page").and_then(|v| v.as_str()) {
-        if let Some((help, doc_slug)) = demo_help_text(page_str) {
-            obj.insert("demo_help".to_string(), json!(help));
-            obj.insert(
-                "demo_help_url".to_string(),
-                json!(format!("/documentation/{}", doc_slug)),
-            );
-        }
+        let (help, doc_slug) = demo_help_text(page_str);
+        obj.insert("demo_help".to_string(), json!(help));
+        obj.insert(
+            "demo_help_url".to_string(),
+            json!(format!("/documentation/{}", doc_slug)),
+        );
     }
 }
 
