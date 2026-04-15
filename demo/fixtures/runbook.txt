@@ -1,0 +1,27 @@
+OPS RUNBOOK — Enterprise Demo
+=============================
+
+Service health
+--------------
+1. `just status` prints the systemd-style status of all managed services.
+2. If the API gateway is down, tail `logs/gateway.log` and grep for `panic`
+   or `connection refused`.
+3. Restart a single service: `just restart <name>`.
+
+Database
+--------
+- Reset the demo schema: `just db reset` (destroys all data; confirms first).
+- Open a shell: `just db psql`.
+- Run an ad-hoc query: `systemprompt infra db query "<sql>"`.
+
+Agents
+------
+- List: `systemprompt admin agents list`
+- Validate a single agent: `systemprompt admin agents validate <name>`
+- Tail logs: `systemprompt admin agents logs <name>`
+
+Governance
+----------
+- Tail decisions: `systemprompt infra db query "SELECT * FROM governance_decisions ORDER BY created_at DESC LIMIT 20"`
+- Rules live in the plugin hooks YAML and are executed in the Rust handler at
+  extensions/web/admin/src/handlers/webhook/governance/rules.rs
