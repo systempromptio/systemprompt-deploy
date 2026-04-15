@@ -22,7 +22,7 @@ TRACE_ID=$("$CLI" infra logs trace list --limit 1 --profile "$PROFILE" 2>&1 | gr
 if [[ -n "$TRACE_ID" ]]; then
   run_cli_head 40 infra logs trace show "$TRACE_ID" --all
 else
-  info "No traces found. Run agents/03-agent-messaging.sh first to generate traces."
+  info "No traces yet — run SEED_AGENT_RUN=1 ./demo/01-seed-data.sh to populate one."
 fi
 
 subheader "STEP 3: Artifacts"

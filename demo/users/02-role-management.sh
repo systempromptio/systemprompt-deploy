@@ -23,7 +23,10 @@ USER_ID=$("$CLI" admin users list --profile "$PROFILE" 2>&1 | grep -oP '"id":\s*
 if [[ -n "$USER_ID" ]]; then
   run_cli_head 30 admin users show "$USER_ID"
 else
-  info "No users found."
+  info "No users in DB yet — authenticate once via the web UI to seed one."
 fi
+
+subheader "STEP 3: User Role Statistics"
+run_cli_indented admin users stats
 
 header "ROLE MANAGEMENT DEMO COMPLETE"

@@ -16,25 +16,7 @@ PROFILE="${1:-local}"
 
 header "DEMO: AGENT TRACING" "Full Pipeline with Artifacts & MCP"
 
-# ──────────────────────────────────────────────
-#  Preflight: is any agent configured?
-# ──────────────────────────────────────────────
-LIST_OUTPUT=$("$CLI" admin agents list --profile "$PROFILE" 2>&1)
-TARGET_AGENT=$(echo "$LIST_OUTPUT" | grep -oP '"(name|id)":\s*"\K[^"]+' | head -1 || true)
-
-if [[ -z "$TARGET_AGENT" ]]; then
-  info "No agents configured in services/agents/ (empty template state)."
-  info ""
-  info "This demo exercises the platform agent runtime — messaging, AI"
-  info "reasoning, MCP tool use, artifacts, and tracing. It requires at"
-  info "least one agent YAML at services/agents/<id>.yaml and the id"
-  info "listed in a plugin under services/plugins/<plugin>.yaml."
-  info ""
-  info "To enable this demo, add an agent YAML and run: just start"
-  header "DEMO SKIPPED — no agents configured"
-  exit 0
-fi
-
+TARGET_AGENT=developer_agent
 echo "  Target agent: $TARGET_AGENT"
 echo ""
 

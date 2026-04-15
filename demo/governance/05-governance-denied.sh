@@ -123,15 +123,12 @@ echo ""
 #  GOVERNANCE LOG
 # ──────────────────────────────────────────────
 echo "=========================================="
-echo "  GOVERNANCE LOG"
+echo "  GOVERNANCE LOG — recent deny decisions"
 echo "=========================================="
 echo ""
-LOGFILE=$(ls -t /tmp/systemprompt-governance-*.log 2>/dev/null | head -1)
-if [[ -n "$LOGFILE" ]]; then
-  tail -5 "$LOGFILE"
-else
-  echo "(No governance log found)"
-fi
+"$CLI" infra db query \
+  "SELECT decision, tool_name, policy, reason FROM governance_decisions WHERE decision = 'deny' ORDER BY created_at DESC LIMIT 10" \
+  --profile "$PROFILE" 2>&1 | grep -v "^\[profile"
 
 # ──────────────────────────────────────────────
 #  AUDIT: Verify governance denials

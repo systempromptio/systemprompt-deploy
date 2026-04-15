@@ -47,7 +47,7 @@ pub use marketplace_upload::{
 };
 pub use plugins_config::{
     AgentDetail, AgentInfo, AgentSkillInfo, HookCatalogEntry, HookDetail, HookOverview,
-    McpServerDetail, PlatformPluginConfig, PlatformPluginConfigFile, PluginDetail,
+    McpServerDetail, PlatformPluginConfig, PluginDetail,
     PluginOnboardingConfig, PluginOnboardingDataSource, PluginOnboardingQuestion, PluginOverview,
     RequiredSecret, SkillInfo,
 };

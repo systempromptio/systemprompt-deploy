@@ -5,7 +5,7 @@
 # What this does:
 #   1. Lists all database-synced skills
 #   2. Shows disk/db sync status
-#   3. Lists skill YAMLs under services/skills/
+#   3. Shows one skill in full (config + markdown body)
 #
 # Cost: Free (no AI call)
 
@@ -21,22 +21,17 @@ run_cli_head 30 core skills list
 subheader "STEP 2: Disk/DB Sync Status"
 run_cli_indented core skills status
 
-subheader "STEP 3: Skill YAMLs on disk"
+subheader "STEP 3: Nested skill directories on disk"
 SKILLS_DIR="$PROJECT_DIR/services/skills"
-if [[ -d "$SKILLS_DIR" ]]; then
-  echo "  \$ ls $SKILLS_DIR/*.yaml"
-  echo ""
-  ls "$SKILLS_DIR"/*.yaml 2>/dev/null | sed "s|$PROJECT_DIR/||" | sed 's/^/    /'
-  echo ""
-  FIRST_SKILL_YAML=$(ls "$SKILLS_DIR"/*.yaml 2>/dev/null | head -1 || true)
-  if [[ -n "$FIRST_SKILL_YAML" ]]; then
-    echo "  First skill YAML:"
-    echo ""
-    head -20 "$FIRST_SKILL_YAML" | sed 's/^/    /'
-    echo ""
-  fi
-else
-  info "services/skills/ not found"
-fi
+echo "  \$ ls $SKILLS_DIR/*/config.yaml"
+echo ""
+for cfg in "$SKILLS_DIR"/*/config.yaml; do
+  [[ -f "$cfg" ]] || continue
+  echo "$cfg" | sed "s|$PROJECT_DIR/||" | sed 's/^/    /'
+done
+echo ""
 
-header "SKILL LIFECYCLE DEMO COMPLETE" "Showed: list, status, disk config"
+subheader "STEP 4: Show use_dangerous_secret (full config + instructions)"
+run_cli_head 40 core skills show use_dangerous_secret
+
+header "SKILL LIFECYCLE DEMO COMPLETE" "Showed: list, status, nested config layout"

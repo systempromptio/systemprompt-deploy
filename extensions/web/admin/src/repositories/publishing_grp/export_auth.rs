@@ -1,15 +1,14 @@
 use std::path::Path;
 
 use crate::types::PlatformPluginConfig;
-use crate::types::PlatformPluginConfigFile;
 use crate::types::ROLE_ADMIN;
 use systemprompt_web_shared::error::MarketplaceError;
 
 pub fn _load_authorized_plugin_configs(
-    plugins_path: &Path,
+    _plugins_path: &Path,
     roles: &[String],
 ) -> Result<Vec<(String, PlatformPluginConfig)>, MarketplaceError> {
-    let all_plugins = load_all_plugin_configs(plugins_path)?;
+    let all_plugins = crate::repositories::plugins_grp::plugin_loader::load_all_plugins()?;
 
     let is_admin = roles.iter().any(|r| r == ROLE_ADMIN);
     let mut authorized: Vec<(String, PlatformPluginConfig)> = all_plugins
@@ -59,10 +58,10 @@ pub fn _load_authorized_plugin_configs(
 }
 
 pub fn load_plugin_configs_by_ids(
-    plugins_path: &Path,
+    _plugins_path: &Path,
     authorized_ids: &std::collections::HashSet<String>,
 ) -> Result<Vec<(String, PlatformPluginConfig)>, MarketplaceError> {
-    let all_plugins = load_all_plugin_configs(plugins_path)?;
+    let all_plugins = crate::repositories::plugins_grp::plugin_loader::load_all_plugins()?;
 
     let mut authorized: Vec<(String, PlatformPluginConfig)> = all_plugins
         .iter()
@@ -102,49 +101,3 @@ pub fn load_plugin_configs_by_ids(
     Ok(authorized)
 }
 
-fn load_all_plugin_configs(
-    plugins_path: &Path,
-) -> Result<Vec<(String, PlatformPluginConfig)>, MarketplaceError> {
-    let mut plugins = Vec::new();
-    if !plugins_path.exists() {
-        return Ok(plugins);
-    }
-
-    let mut entries: Vec<_> = std::fs::read_dir(plugins_path)?
-        .filter_map(|e| match e {
-            Ok(entry) => Some(entry),
-            Err(err) => {
-                tracing::warn!(error = %err, "Failed to read plugins directory entry");
-                None
-            }
-        })
-        .collect();
-    entries.sort_by_key(std::fs::DirEntry::file_name);
-
-    for entry in entries {
-        let path = entry.path();
-        if !path.is_dir() {
-            continue;
-        }
-        let config_path = path.join("config.yaml");
-        if !config_path.exists() {
-            continue;
-        }
-        let content = std::fs::read_to_string(&config_path).map_err(|e| {
-            MarketplaceError::Internal(format!("Failed to read {}: {e}", config_path.display()))
-        })?;
-        let plugin_file: PlatformPluginConfigFile = match serde_yaml::from_str(&content) {
-            Ok(p) => p,
-            Err(e) => {
-                return Err(MarketplaceError::Internal(format!(
-                    "Failed to parse {}: {e}",
-                    config_path.display()
-                )));
-            }
-        };
-        let dir_name = entry.file_name().to_string_lossy().into_owned();
-        plugins.push((dir_name, plugin_file.plugin));
-    }
-
-    Ok(plugins)
-}

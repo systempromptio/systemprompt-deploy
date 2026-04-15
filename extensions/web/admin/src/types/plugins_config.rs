@@ -41,9 +41,16 @@ pub struct PlatformPluginConfig {
     pub onboarding: Option<PluginOnboardingConfig>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct PlatformPluginConfigFile {
-    pub plugin: PlatformPluginConfig,
+impl PlatformPluginConfig {
+    pub const fn from_base(base: PluginConfig) -> Self {
+        Self {
+            base,
+            roles: Vec::new(),
+            depends: Vec::new(),
+            variables: Vec::new(),
+            onboarding: None,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
