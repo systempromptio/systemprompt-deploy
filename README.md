@@ -53,9 +53,9 @@ Four layers of synchronous in-process enforcement on every tool call: **scope** 
 ### Four-layer governance pipeline
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/01-governance.svg">
-  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/01-governance.svg">
-  <img src="demo/recording/svg/output/dark/01-governance.svg" alt="Governance pipeline — terminal recording" width="820">
+  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/01-governance.svg?v=2">
+  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/01-governance.svg?v=2">
+  <img src="demo/recording/svg/output/dark/01-governance.svg?v=2" alt="Governance pipeline — terminal recording" width="820">
 </picture>
 
 > Every tool call hits `PreToolUse → govern`. Scope, secret scan, blocklist, rate limit — all synchronous, all in-process, all audited. → [`demo/recording/svg/svg-01-governance.sh`](demo/recording/svg/svg-01-governance.sh)
@@ -73,9 +73,9 @@ Four layers of synchronous in-process enforcement on every tool call: **scope** 
 ### Thousands of governed requests per second
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/06-benchmark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/06-benchmark.svg">
-  <img src="demo/recording/svg/output/dark/06-benchmark.svg" alt="Governance benchmark — terminal recording" width="820">
+  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/06-benchmark.svg?v=2">
+  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/06-benchmark.svg?v=2">
+  <img src="demo/recording/svg/output/dark/06-benchmark.svg?v=2" alt="Governance benchmark — terminal recording" width="820">
 </picture>
 
 > Measure it yourself with `just benchmark`. Author's laptop: **3,308 req/s** on the burst run, p50 13.5 ms / p99 22.7 ms — every request running JWT validation, scope resolution, three rule evaluations, and an async audit write. Governance adds <1% to AI response time. → [`svg-06-benchmark.sh`](demo/recording/svg/svg-06-benchmark.sh)
@@ -89,9 +89,9 @@ Structured evidence for every interaction. Every tool call produces a five-point
 ### Queryable audit trail
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/03-audit.svg">
-  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/03-audit.svg">
-  <img src="demo/recording/svg/output/dark/03-audit.svg" alt="Audit trail — terminal recording" width="820">
+  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/03-audit.svg?v=2">
+  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/03-audit.svg?v=2">
+  <img src="demo/recording/svg/output/dark/03-audit.svg?v=2" alt="Audit trail — terminal recording" width="820">
 </picture>
 
 > Identity → Agent Context → Permissions → Tool Execution → Result. Queryable, SIEM-ready, cost-attributed. → [`svg-03-audit.sh`](demo/recording/svg/svg-03-audit.sh)
