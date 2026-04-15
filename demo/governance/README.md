@@ -39,3 +39,10 @@ The governance pipeline:
 3. Rule engine (scope_check, secret_detection, rate_limit)
 4. Audit write (async database INSERT)
 5. Response (ALLOW or DENY)
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

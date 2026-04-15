@@ -28,3 +28,10 @@ Run `../00-preflight.sh` first. More data = richer analytics output.
 | 06 | content-traffic.sh | Content engagement, traffic sources, geo, devices | Free |
 | 07 | conversations.sh | Conversation stats, trends, listing | Free |
 | 08 | tool-analytics.sh | Tool usage stats, listings, trends | Free |
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

@@ -29,3 +29,10 @@ Run `../00-preflight.sh` first.
 
 - Scripts 01-03 are read-only
 - Script 04 adds a test ban (192.168.99.99) and removes it — safe cleanup
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

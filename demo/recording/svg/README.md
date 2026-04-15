@@ -68,3 +68,10 @@ just record-svgs 3 7                               # regenerate svg-03 + svg-07 
 - **Colors:** only the palette defined in `_colors.sh`. svg-term renders anything else as default text.
 - **Commands via `type_cmd`** (not raw `echo`) — the keystroke animation is what makes the recording feel alive.
 - **Real data only.** Every cURL call, every CLI command runs for real against the local server. When demos drift, these scripts break loudly and visibly.
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

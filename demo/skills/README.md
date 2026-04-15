@@ -25,3 +25,10 @@ Run `../00-preflight.sh` first.
 | 03 | file-management.sh | File listing, upload config, storage stats | Free |
 | 04 | plugin-management.sh | Plugin inspection, validation, hooks, extensions | Free |
 | 05 | contexts.sh | Context CRUD — create, show, edit, delete | Free |
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

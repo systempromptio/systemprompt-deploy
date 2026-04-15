@@ -25,3 +25,10 @@ Run `../00-preflight.sh` first.
 | 03 | jobs.sh | Job scheduling, execution history | Free |
 | 04 | logs.sh | Log viewing, search, traces, AI requests, tool executions | Free |
 | 05 | config.sh | Full platform configuration overview, validation, paths | Free |
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

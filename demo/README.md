@@ -159,3 +159,10 @@ systemprompt infra services start --kill-port-process
 
 SVG terminal recordings and video recording infrastructure are in `recording/`.
 See `recording/RECORDING-GUIDE.md` for video production workflow.
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

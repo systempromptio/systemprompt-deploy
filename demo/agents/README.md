@@ -31,3 +31,10 @@ Run `../00-preflight.sh` first.
 - Scripts 01, 02, 04, 05 are read-only and free
 - Script 03 sends a real message to the developer_agent (one AI call ~$0.01)
 - Script 04 shows traces from prior agent runs — run 03 first for data
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.

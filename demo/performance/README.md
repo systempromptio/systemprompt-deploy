@@ -27,3 +27,10 @@ Run `../00-preflight.sh` first. Run some governance demos first for trace data.
 
 - Both scripts download `hey` (HTTP load testing tool) to `/tmp/hey` on first run
 - No AI calls — pure infrastructure benchmarking
+
+
+---
+
+## License
+
+MIT - See [LICENSE](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE) for details.
