@@ -1,8 +1,8 @@
 use sqlx::PgPool;
 use systemprompt::identifiers::{AgentId, McpServerId, SkillId, UserId};
 
-use crate::types::{UserPlugin, UserPluginWithAssociations};
 use super::types::{AssociatedEntity, UserPluginEnriched};
+use crate::types::{UserPlugin, UserPluginWithAssociations};
 
 pub async fn list_user_plugins(
     pool: &PgPool,

@@ -1,10 +1,10 @@
 use sqlx::PgPool;
 use systemprompt::identifiers::{AgentId, McpServerId, SkillId, UserId};
 
-use crate::repositories::export_validation::{compute_bundle_counts, compute_content_version};
-use crate::repositories::user_plugins::find_plugin_with_associations;
 use super::bundle_files;
 use super::types::{PluginBundle, PluginFile};
+use crate::repositories::export_validation::{compute_bundle_counts, compute_content_version};
+use crate::repositories::user_plugins::find_plugin_with_associations;
 use crate::types::UserPlugin;
 
 fn slugify(name: &str) -> String {
@@ -56,9 +56,12 @@ pub async fn build_user_plugin_bundle(
     let mut files = Vec::new();
     let slugified_name = slugify(&user_plugin.name);
 
-    let token =
-        crate::repositories::plugin_jwt::generate_plugin_token(ctx.user_id, ctx.email, &slugified_name)
-            .ok();
+    let token = crate::repositories::plugin_jwt::generate_plugin_token(
+        ctx.user_id,
+        ctx.email,
+        &slugified_name,
+    )
+    .ok();
 
     collect_skill_files(
         ctx,

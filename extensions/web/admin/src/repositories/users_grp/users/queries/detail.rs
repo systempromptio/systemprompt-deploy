@@ -2,8 +2,8 @@ use sqlx::PgPool;
 use systemprompt::identifiers::{Email, UserId};
 
 use crate::activity;
-use crate::types::{EventTypeCount, ToolUsageCount, UserSession, UserSummary};
 use crate::repositories::user_skills;
+use crate::types::{EventTypeCount, ToolUsageCount, UserSession, UserSummary};
 
 pub async fn find_user_detail(
     pool: &PgPool,

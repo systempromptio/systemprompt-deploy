@@ -44,7 +44,10 @@ pub fn load_homepage_config() -> Result<Option<Arc<HomepageConfig>>, ConfigError
         })?;
 
     if let Ok(paths) = AppPaths::get() {
-        populate_demo_showcase(&mut homepage_config, paths.system().root().join("demo").as_path());
+        populate_demo_showcase(
+            &mut homepage_config,
+            paths.system().root().join("demo").as_path(),
+        );
     }
 
     tracing::info!("Loaded homepage config from config/homepage.yaml");

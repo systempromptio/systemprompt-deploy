@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use sqlx::PgPool;
 use systemprompt::identifiers::{McpServerId, UserId};
 
-use crate::repositories::skill_secrets::resolve_secrets_for_skill;
 use super::types::{ManifestAuthor, McpConfigFile, McpServerEntry, PluginFile, PluginManifest};
+use crate::repositories::skill_secrets::resolve_secrets_for_skill;
 
 #[derive(Debug, Clone, Copy)]
 pub struct BundleContext<'a> {

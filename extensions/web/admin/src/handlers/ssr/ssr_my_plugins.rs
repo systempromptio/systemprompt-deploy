@@ -26,14 +26,10 @@ pub async fn my_plugins_page(
 ) -> Response {
     let (enriched, entity_usage, skill_eff, agent_eff) = tokio::join!(
         async {
-            let services_path = super::get_services_path()
-                .unwrap_or_else(|_| std::path::PathBuf::from("services"));
-            repositories::list_effective_enriched_plugins(
-                &pool,
-                &user_ctx.user_id,
-                &services_path,
-            )
-            .await
+            let services_path =
+                super::get_services_path().unwrap_or_else(|_| std::path::PathBuf::from("services"));
+            repositories::list_effective_enriched_plugins(&pool, &user_ctx.user_id, &services_path)
+                .await
         },
         async {
             conversation_analytics::fetch_entity_usage_summary(&pool, &user_ctx.user_id)

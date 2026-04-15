@@ -86,9 +86,7 @@ impl PageDataProvider for DocsPageDataProvider {
     }
 
     async fn provide_page_data(&self, ctx: &PageContext<'_>) -> anyhow::Result<Value> {
-        let item = ctx
-            .content_item()
-            .ok_or(DocsError::ContentItemRequired)?;
+        let item = ctx.content_item().ok_or(DocsError::ContentItemRequired)?;
 
         let learning_content = DocsLearningContent::from_content_item(item);
         let mut data = learning_content.to_template_data();

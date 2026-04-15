@@ -7,13 +7,11 @@ use axum::{
     Json,
 };
 use sqlx::PgPool;
-use systemprompt::models::ProfileBootstrap;
 
 use crate::repositories;
 use crate::types::access_control::{
-    AccessControlQuery, AccessDecision, BulkAssignRequest, RuleType, UpdateEntityRulesRequest,
+    AccessControlQuery, BulkAssignRequest, UpdateEntityRulesRequest,
 };
-use crate::types::{UpdatePluginRequest, ENTITY_PLUGIN};
 
 pub async fn list_access_rules_handler(
     State(pool): State<Arc<PgPool>>,
@@ -60,12 +58,7 @@ pub async fn update_entity_rules_handler(
     .await;
 
     match result {
-        Ok(rules) => {
-            if body.sync_yaml && entity_type == ENTITY_PLUGIN {
-                sync_plugin_roles_to_yaml(&entity_id, &body.rules);
-            }
-            Json(serde_json::json!({ "rules": rules })).into_response()
-        }
+        Ok(rules) => Json(serde_json::json!({ "rules": rules })).into_response(),
         Err(e) => {
             tracing::error!(error = %e, entity_type, entity_id, "Failed to update access control rules");
             (
@@ -88,20 +81,11 @@ pub async fn bulk_assign_handler(
         .collect();
 
     match repositories::access_control::bulk_set_rules(&pool, &entities, &body.rules).await {
-        Ok(count) => {
-            if body.sync_yaml {
-                for (et, eid) in &entities {
-                    if et == ENTITY_PLUGIN {
-                        sync_plugin_roles_to_yaml(eid, &body.rules);
-                    }
-                }
-            }
-            Json(serde_json::json!({
-                "updated_count": count,
-                "rules_per_entity": body.rules.len(),
-            }))
-            .into_response()
-        }
+        Ok(count) => Json(serde_json::json!({
+            "updated_count": count,
+            "rules_per_entity": body.rules.len(),
+        }))
+        .into_response(),
         Err(e) => {
             tracing::error!(error = %e, "Failed to bulk assign access control rules");
             (
@@ -124,43 +108,5 @@ pub async fn access_control_departments_handler(State(pool): State<Arc<PgPool>>)
             )
                 .into_response()
         }
-    }
-}
-
-fn sync_plugin_roles_to_yaml(
-    plugin_id: &str,
-    access_rules: &[crate::types::access_control::AccessControlRuleInput],
-) {
-    let allowed_roles: Vec<String> = access_rules
-        .iter()
-        .filter(|r| r.rule_type == RuleType::Role && r.access == AccessDecision::Allow)
-        .map(|r| r.rule_value.clone())
-        .collect();
-
-    let services_path = match ProfileBootstrap::get() {
-        Ok(profile) => std::path::PathBuf::from(&profile.paths.services),
-        Err(e) => {
-            tracing::warn!(error = %e, plugin_id, "Failed to get services path for YAML sync");
-            return;
-        }
-    };
-
-    let req = UpdatePluginRequest {
-        name: None,
-        description: None,
-        version: None,
-        enabled: None,
-        category: None,
-        keywords: None,
-        author_name: None,
-        roles: Some(allowed_roles),
-        skills: None,
-        agents: None,
-        mcp_servers: None,
-        hooks: None,
-    };
-
-    if let Err(e) = repositories::update_plugin(&services_path, plugin_id, &req) {
-        tracing::error!(error = %e, plugin_id, "Failed to sync roles to plugin YAML");
     }
 }

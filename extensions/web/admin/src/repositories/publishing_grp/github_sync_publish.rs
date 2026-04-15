@@ -115,9 +115,7 @@ async fn prepare_publish_content(
     Ok((plugin_count, push_url))
 }
 
-async fn commit_and_push_if_changed(
-    ctx: &PublishContext<'_>,
-) -> Result<SyncResult, GitSyncError> {
+async fn commit_and_push_if_changed(ctx: &PublishContext<'_>) -> Result<SyncResult, GitSyncError> {
     if !git_has_changes(ctx.local_path)? {
         let duration_ms = elapsed_ms(ctx.start);
         tracing::info!(marketplace_id = ctx.marketplace_id, "No changes to publish");

@@ -228,7 +228,9 @@ fn compute_longest_streak(dates_desc: &[chrono::NaiveDate]) -> i32 {
     longest
 }
 
-pub(super) async fn update_user_rank(params: &UserRankParams<'_>) -> Result<(), super::GamificationError> {
+pub(super) async fn update_user_rank(
+    params: &UserRankParams<'_>,
+) -> Result<(), super::GamificationError> {
     let total_xp_i32 = i32::try_from(params.total_xp).unwrap_or(i32::MAX);
     sqlx::query!(
         r"

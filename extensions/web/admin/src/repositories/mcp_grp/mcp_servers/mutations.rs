@@ -1,10 +1,10 @@
 use std::fmt::Write;
 use std::path::Path;
 
+use super::queries::find_mcp_server;
 use crate::types::{
     CreateMcpRequest, McpServerDetail, UpdateMcpRequest, SERVER_TYPE_EXTERNAL, SERVER_TYPE_INTERNAL,
 };
-use super::queries::find_mcp_server;
 use systemprompt_web_shared::error::MarketplaceError;
 
 pub fn create_mcp_server(

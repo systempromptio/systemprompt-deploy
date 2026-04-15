@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
+use crate::repositories::cowork_frontmatter;
+use crate::repositories::export::PluginFile;
 use crate::types::hooks_export::{
     CommandHook, HookEventType, HookHandler, HooksFile, MatcherGroup,
 };
-use crate::repositories::cowork_frontmatter;
-use crate::repositories::export::PluginFile;
 use systemprompt_web_shared::error::MarketplaceError;
 
 pub fn sanitize_for_cowork(

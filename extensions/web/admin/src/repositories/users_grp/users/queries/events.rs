@@ -3,9 +3,7 @@ use std::fmt::Write;
 use sqlx::PgPool;
 use systemprompt::identifiers::UserId;
 
-use crate::types::{
-    EventRow, EventTypeCount, EventsQuery, EventsResponse, UsageEvent,
-};
+use crate::types::{EventRow, EventTypeCount, EventsQuery, EventsResponse, UsageEvent};
 
 pub async fn get_user_usage(
     pool: &PgPool,

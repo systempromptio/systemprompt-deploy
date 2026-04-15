@@ -43,7 +43,10 @@ fn service_core_js(p: &Path) -> Vec<AssetDefinition> {
         AssetDefinition::js(p.join("sse-client.js"), "js/services/sse-client.js"),
         AssetDefinition::js(p.join("table-sort.js"), "js/services/table-sort.js"),
         AssetDefinition::js(p.join("theme.js"), "js/services/theme.js"),
-        AssetDefinition::js(p.join("sp-confirm-dialog.js"), "js/services/sp-confirm-dialog.js"),
+        AssetDefinition::js(
+            p.join("sp-confirm-dialog.js"),
+            "js/services/sp-confirm-dialog.js",
+        ),
         AssetDefinition::js(p.join("sp-toast.js"), "js/services/sp-toast.js"),
         AssetDefinition::js(p.join("toast.js"), "js/services/toast.js"),
         AssetDefinition::js(p.join("toc-highlight.js"), "js/services/toc-highlight.js"),
@@ -253,4 +256,3 @@ pub(super) fn admin_assets(storage_css: &Path, storage_js: &Path) -> Vec<AssetDe
         ),
     ]
 }
-

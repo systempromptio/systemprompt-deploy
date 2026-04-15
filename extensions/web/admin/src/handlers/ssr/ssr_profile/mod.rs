@@ -89,8 +89,7 @@ fn build_profile_page_data(input: &ProfilePageInput<'_>) -> serde_json::Value {
         "mcp_servers": input.mkt_ctx.mcp_count,
         "hooks": input.hooks_count,
     });
-    let archetype_result =
-        archetype::classify_archetype(input.user_metrics, input.global_averages);
+    let archetype_result = archetype::classify_archetype(input.user_metrics, input.global_averages);
     let (strengths, weaknesses) =
         analysis::compute_strengths_weaknesses(input.user_metrics, input.global_averages);
     let trend_data = trends::build_trend_data(input.daily_summaries_data, input.global_averages);

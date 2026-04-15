@@ -123,6 +123,10 @@ impl PublishPipelineJob {
                 tracing::debug!("RSS feed generation completed");
                 stats.record_success();
             }
+            Err(e) if e.to_string().contains("No RSS feeds generated") => {
+                tracing::debug!("RSS feed generation skipped: no RssFeedProvider registered");
+                stats.record_success();
+            }
             Err(e) => {
                 tracing::error!(error = %e, "RSS feed generation failed");
                 stats.record_failure();

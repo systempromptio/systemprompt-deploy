@@ -86,7 +86,10 @@ async fn fetch_unencrypted_secrets(
     .fetch_all(pool.as_ref())
     .await
     .map_err(MarketplaceError::Database)?;
-    Ok(rows.into_iter().map(|r| (r.id, r.user_id, r.var_name, r.var_value)).collect())
+    Ok(rows
+        .into_iter()
+        .map(|r| (r.id, r.user_id, r.var_name, r.var_value))
+        .collect())
 }
 
 async fn migrate_secrets(
@@ -132,11 +135,13 @@ async fn encrypt_and_store_secret(
     let encrypted = secret_crypto::encrypt(&dek, &nonce, var_value.as_bytes())
         .map_err(|e| MarketplaceError::Internal(format!("Encryption error: {e}")))?;
 
-    let key_version: i32 =
-        sqlx::query_scalar!("SELECT key_version FROM user_encryption_keys WHERE user_id = $1", user_id)
-            .fetch_one(pool.as_ref())
-            .await
-            .unwrap_or(1);
+    let key_version: i32 = sqlx::query_scalar!(
+        "SELECT key_version FROM user_encryption_keys WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(pool.as_ref())
+    .await
+    .unwrap_or(1);
 
     sqlx::query!(
         "UPDATE plugin_env_vars SET encrypted_value = $1, value_nonce = $2, \

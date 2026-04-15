@@ -2,7 +2,6 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use systemprompt::identifiers::{LinkId, SessionId};
 
-
 use crate::repository::{LinkAnalyticsRepository, LinkRepository};
 use systemprompt_web_shared::error::BlogError;
 use systemprompt_web_shared::models::{

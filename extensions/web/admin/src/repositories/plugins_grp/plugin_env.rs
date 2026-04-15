@@ -73,12 +73,14 @@ pub async fn upsert_plugin_env_var(
                 "Cannot store secret — encryption not configured: {e}"
             ))
         })?;
-        let dek = crate::repositories::secret_keys::get_or_create_user_dek(pool, user_id, &master_key)
-            .await
-            .map_err(|e| MarketplaceError::Internal(format!("{e}")))?;
+        let dek =
+            crate::repositories::secret_keys::get_or_create_user_dek(pool, user_id, &master_key)
+                .await
+                .map_err(|e| MarketplaceError::Internal(format!("{e}")))?;
         let nonce = crate::repositories::secret_crypto::generate_nonce();
-        let encrypted = crate::repositories::secret_crypto::encrypt(&dek, &nonce, var_value.as_bytes())
-            .map_err(|e| MarketplaceError::Internal(format!("{e}")))?;
+        let encrypted =
+            crate::repositories::secret_crypto::encrypt(&dek, &nonce, var_value.as_bytes())
+                .map_err(|e| MarketplaceError::Internal(format!("{e}")))?;
 
         sqlx::query!(
             "INSERT INTO plugin_env_vars \

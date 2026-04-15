@@ -76,7 +76,10 @@ pub async fn resolve_mcp_server_slugs<'e, E: sqlx::Executor<'e, Database = sqlx:
                     None,
                 )
             })?;
-    let map: HashMap<String, String> = raw_rows.into_iter().map(|r| (r.mcp_server_id, r.id)).collect();
+    let map: HashMap<String, String> = raw_rows
+        .into_iter()
+        .map(|r| (r.mcp_server_id, r.id))
+        .collect();
     slugs
         .iter()
         .map(|slug| {
@@ -95,13 +98,13 @@ pub async fn resolve_skill_uuids_to_slugs<'e, E: sqlx::Executor<'e, Database = s
         return Ok(vec![]);
     }
 
-    let raw_rows =
-        sqlx::query!("SELECT id, skill_id FROM user_skills WHERE id = ANY($1)", uuids)
-            .fetch_all(pool)
-            .await
-            .map_err(|e| {
-                McpError::internal_error(format!("Failed to resolve Skill UUIDs: {e}"), None)
-            })?;
+    let raw_rows = sqlx::query!(
+        "SELECT id, skill_id FROM user_skills WHERE id = ANY($1)",
+        uuids
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| McpError::internal_error(format!("Failed to resolve Skill UUIDs: {e}"), None))?;
     let map: HashMap<String, String> = raw_rows.into_iter().map(|r| (r.id, r.skill_id)).collect();
     Ok(uuids
         .iter()
@@ -117,13 +120,13 @@ pub async fn resolve_agent_uuids_to_slugs<'e, E: sqlx::Executor<'e, Database = s
         return Ok(vec![]);
     }
 
-    let raw_rows =
-        sqlx::query!("SELECT id, agent_id FROM user_agents WHERE id = ANY($1)", uuids)
-            .fetch_all(pool)
-            .await
-            .map_err(|e| {
-                McpError::internal_error(format!("Failed to resolve Agent UUIDs: {e}"), None)
-            })?;
+    let raw_rows = sqlx::query!(
+        "SELECT id, agent_id FROM user_agents WHERE id = ANY($1)",
+        uuids
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| McpError::internal_error(format!("Failed to resolve Agent UUIDs: {e}"), None))?;
     let map: HashMap<String, String> = raw_rows.into_iter().map(|r| (r.id, r.agent_id)).collect();
     Ok(uuids
         .iter()
@@ -142,14 +145,19 @@ pub async fn resolve_mcp_server_uuids_to_slugs<
         return Ok(vec![]);
     }
 
-    let raw_rows =
-        sqlx::query!("SELECT id, mcp_server_id FROM user_mcp_servers WHERE id = ANY($1)", uuids)
-            .fetch_all(pool)
-            .await
-            .map_err(|e| {
-                McpError::internal_error(format!("Failed to resolve MCP server UUIDs: {e}"), None)
-            })?;
-    let map: HashMap<String, String> = raw_rows.into_iter().map(|r| (r.id, r.mcp_server_id)).collect();
+    let raw_rows = sqlx::query!(
+        "SELECT id, mcp_server_id FROM user_mcp_servers WHERE id = ANY($1)",
+        uuids
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| {
+        McpError::internal_error(format!("Failed to resolve MCP server UUIDs: {e}"), None)
+    })?;
+    let map: HashMap<String, String> = raw_rows
+        .into_iter()
+        .map(|r| (r.id, r.mcp_server_id))
+        .collect();
     Ok(uuids
         .iter()
         .filter_map(|uuid| map.get(uuid).cloned())

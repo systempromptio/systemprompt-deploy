@@ -56,8 +56,8 @@ pub async fn control_center_page(
         daily_summaries::fetch_global_averages(pool.as_ref()),
     );
 
-    let services_path = super::get_services_path()
-        .unwrap_or_else(|_| std::path::PathBuf::from("services"));
+    let services_path =
+        super::get_services_path().unwrap_or_else(|_| std::path::PathBuf::from("services"));
     let mut entity_counts = fetch_entity_counts(pool.as_ref(), user_id.as_str()).await;
     let (org_plugins, org_skills, org_agents, org_mcp) =
         crate::repositories::count_org_entity_additions(pool.as_ref(), &services_path).await;

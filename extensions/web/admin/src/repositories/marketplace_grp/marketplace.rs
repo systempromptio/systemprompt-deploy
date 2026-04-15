@@ -6,9 +6,7 @@ use crate::types::{
     VisibilityRuleInput,
 };
 
-pub async fn list_plugin_usage(
-    _pool: &PgPool,
-) -> Result<Vec<PluginUsageAggregate>, sqlx::Error> {
+pub async fn list_plugin_usage(_pool: &PgPool) -> Result<Vec<PluginUsageAggregate>, sqlx::Error> {
     Ok(vec![])
 }
 
@@ -19,9 +17,7 @@ pub async fn list_plugin_users(
     Ok(vec![])
 }
 
-pub async fn list_plugin_ratings(
-    pool: &PgPool,
-) -> Result<Vec<PluginRatingAggregate>, sqlx::Error> {
+pub async fn list_plugin_ratings(pool: &PgPool) -> Result<Vec<PluginRatingAggregate>, sqlx::Error> {
     sqlx::query_as!(
         PluginRatingAggregate,
         r#"SELECT

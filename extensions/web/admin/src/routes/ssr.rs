@@ -157,8 +157,14 @@ fn user_page_routes() -> Router<Arc<PgPool>> {
             "/governance/decisions",
             get(handlers::ssr::governance_decisions_page),
         )
-        .route("/governance/audit", get(handlers::ssr::governance_audit_page))
-        .route("/governance/rules", get(handlers::ssr::governance_rules_page))
+        .route(
+            "/governance/audit",
+            get(handlers::ssr::governance_audit_page),
+        )
+        .route(
+            "/governance/rules",
+            get(handlers::ssr::governance_rules_page),
+        )
         .route(
             "/governance/violations",
             get(handlers::ssr::governance_violations_page),
@@ -167,7 +173,10 @@ fn user_page_routes() -> Router<Arc<PgPool>> {
             "/governance/rate-limits",
             get(handlers::ssr::governance_rate_limits_page),
         )
-        .route("/governance/hooks", get(handlers::ssr::governance_hooks_page))
+        .route(
+            "/governance/hooks",
+            get(handlers::ssr::governance_hooks_page),
+        )
         .route("/traces", get(handlers::ssr::traces_page))
         .route("/access-control", get(handlers::ssr::access_control_page))
         .route("/analytics", get(handlers::ssr::analytics_overview_page))

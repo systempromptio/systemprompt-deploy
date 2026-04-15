@@ -66,11 +66,12 @@ fn build_skill_json(
     let agent_count =
         count_entities_via_plugins(skill_id_str, ctx.skill_plugin_map, ctx.agent_plugin_map);
 
-    let source = if skill.source_id.as_str() == SOURCE_CUSTOM || skill.source_id.as_str() == SOURCE_USER {
-        "custom"
-    } else {
-        "system"
-    };
+    let source =
+        if skill.source_id.as_str() == SOURCE_CUSTOM || skill.source_id.as_str() == SOURCE_USER {
+            "custom"
+        } else {
+            "system"
+        };
 
     filters.sources.insert(source.to_string());
     for p in &assigned_plugins {

@@ -35,14 +35,13 @@ async fn build_marketplace_list(
 ) -> Result<MarketplaceListResponse<Vec<MarketplacePlugin>>, Response> {
     let services_path = shared::get_services_path().map_err(|r| *r)?;
 
-    let plugins = repositories::list_plugins_for_roles(&services_path, &user_ctx.roles)
-        .map_err(|e| {
+    let plugins =
+        repositories::list_plugins_for_roles(&services_path, &user_ctx.roles).map_err(|e| {
             tracing::error!(error = %e, "Failed to list plugins");
             shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")
         })?;
 
-    let (usage_map, ratings_map, visibility_rules) =
-        fetch_marketplace_data(pool).await?;
+    let (usage_map, ratings_map, visibility_rules) = fetch_marketplace_data(pool).await?;
 
     let mut marketplace_plugins: Vec<MarketplacePlugin> = plugins
         .iter()

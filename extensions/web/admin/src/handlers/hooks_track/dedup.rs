@@ -28,7 +28,11 @@ fn build_raw_key(user_id: &UserId, session_id: &SessionId, payload: &HookEventPa
         HookEvent::PostToolUseFailure(d) => write_post_tool_failure(&mut key, uid, session, d),
         HookEvent::PermissionRequest(d) => {
             let ts = chrono::Utc::now().timestamp();
-            let _ = write!(key, "{uid}:{session}:PermissionRequest:{}:{ts}", d.tool_name);
+            let _ = write!(
+                key,
+                "{uid}:{session}:PermissionRequest:{}:{ts}",
+                d.tool_name
+            );
         }
         HookEvent::UserPromptSubmit(d) => {
             let h = Sha256::digest(d.prompt.as_bytes());
@@ -93,7 +97,11 @@ fn write_post_tool_failure(
 ) {
     if d.tool_use_id.is_empty() {
         let ts = chrono::Utc::now().timestamp();
-        let _ = write!(key, "{uid}:{session}:PostToolUseFailure:{}:{ts}", d.tool_name);
+        let _ = write!(
+            key,
+            "{uid}:{session}:PostToolUseFailure:{}:{ts}",
+            d.tool_name
+        );
     } else {
         let _ = write!(key, "{uid}:{session}:PostToolUseFailure:{}", d.tool_use_id);
     }

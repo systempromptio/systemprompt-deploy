@@ -98,7 +98,8 @@ async fn update_session_tracking(params: &ProcessInsertedEventParams<'_>) {
         }
     }
 
-    if !params.payload.common.permission_mode.is_empty() && params.event_type != EVENT_SESSION_START {
+    if !params.payload.common.permission_mode.is_empty() && params.event_type != EVENT_SESSION_START
+    {
         usage_aggregations::update_session_permission_mode(
             params.pool,
             params.session_id,
@@ -247,17 +248,18 @@ async fn handle_apm_and_concurrent(params: &ProcessInsertedEventParams<'_>) {
     let (apm, eapm) =
         crate::repositories::apm_metrics::calculate_session_apm(pool, session_id.as_str()).await;
 
-    let concurrent_raw = match hooks_track::count_concurrent_sessions(pool, user_id, session_id).await {
-        Ok(v) => v,
-        Err(e) => {
-            tracing::error!(
-                error = %e,
-                session_id = %session_id.as_str(),
-                "Failed to count concurrent sessions for APM"
-            );
-            return;
-        }
-    };
+    let concurrent_raw =
+        match hooks_track::count_concurrent_sessions(pool, user_id, session_id).await {
+            Ok(v) => v,
+            Err(e) => {
+                tracing::error!(
+                    error = %e,
+                    session_id = %session_id.as_str(),
+                    "Failed to count concurrent sessions for APM"
+                );
+                return;
+            }
+        };
 
     let concurrent = numeric::saturating_i32(concurrent_raw) + 1;
 

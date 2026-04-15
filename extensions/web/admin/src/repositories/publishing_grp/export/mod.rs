@@ -107,12 +107,13 @@ async fn resolve_org_plugin_ids(
             tracing::warn!(error = %e, "Failed to resolve authorized org plugin IDs");
             std::collections::HashSet::new()
         });
-    let selected = crate::repositories::user_plugin_selections::list_selected_org_plugins(pool, user_id)
-        .await
-        .unwrap_or_else(|e| {
-            tracing::warn!(error = %e, "Failed to list selected org plugins for user");
-            Vec::new()
-        });
+    let selected =
+        crate::repositories::user_plugin_selections::list_selected_org_plugins(pool, user_id)
+            .await
+            .unwrap_or_else(|e| {
+                tracing::warn!(error = %e, "Failed to list selected org plugins for user");
+                Vec::new()
+            });
     if !selected.is_empty() {
         let selected_set: std::collections::HashSet<String> = selected.into_iter().collect();
         ids.retain(|id| selected_set.contains(id));
@@ -148,9 +149,11 @@ fn generate_bundle_env_and_hook_files(
                 ),
                 executable: false,
             });
-            if let Err(e) =
-                crate::repositories::export_builders::build_hook_files(platform_url, token, &mut bundle.files)
-            {
+            if let Err(e) = crate::repositories::export_builders::build_hook_files(
+                platform_url,
+                token,
+                &mut bundle.files,
+            ) {
                 tracing::warn!(error = %e, plugin_id = %bundle.id, "Failed to generate hook files");
             }
         }
@@ -265,11 +268,12 @@ pub async fn generate_org_marketplace_export_bundles(
     marketplace_id: &str,
     _platform: &str,
 ) -> Result<SyncPluginsResponse, MarketplaceError> {
-    let plugin_ids = crate::repositories::org_marketplaces::list_marketplace_plugin_ids(pool, marketplace_id)
-        .await
-        .map_err(|e| {
-            MarketplaceError::Internal(format!("Failed to list marketplace plugins: {e}"))
-        })?;
+    let plugin_ids =
+        crate::repositories::org_marketplaces::list_marketplace_plugin_ids(pool, marketplace_id)
+            .await
+            .map_err(|e| {
+                MarketplaceError::Internal(format!("Failed to list marketplace plugins: {e}"))
+            })?;
 
     let plugins_path = services_path.join("plugins");
     let skills_path = services_path.join("skills");

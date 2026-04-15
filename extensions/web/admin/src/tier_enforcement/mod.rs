@@ -39,7 +39,9 @@ pub async fn check_limit(
                         user_id = %user_id.as_str(),
                         "Failed to load usage for tier enforcement — denying request (fail closed)"
                     );
-                    return LimitCheckResult::feature_denied("Usage data unavailable — please try again");
+                    return LimitCheckResult::feature_denied(
+                        "Usage data unavailable — please try again",
+                    );
                 }
             };
             check_usage(&limits, &usage, check)

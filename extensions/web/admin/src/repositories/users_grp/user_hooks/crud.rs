@@ -2,7 +2,7 @@ use sqlx::PgPool;
 use systemprompt::identifiers::UserId;
 
 use crate::types::{
-    CreateUserHookRequest, DEFAULT_HOOK_EVENT_TYPES, UpdateUserHookRequest, UserHook,
+    CreateUserHookRequest, UpdateUserHookRequest, UserHook, DEFAULT_HOOK_EVENT_TYPES,
 };
 
 pub async fn ensure_default_hooks(

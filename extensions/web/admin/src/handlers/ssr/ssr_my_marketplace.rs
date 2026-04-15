@@ -19,14 +19,11 @@ pub async fn my_marketplace_page(
     Extension(engine): Extension<AdminTemplateEngine>,
     State(pool): State<Arc<PgPool>>,
 ) -> Response {
-    let services_path = super::get_services_path()
-        .unwrap_or_else(|_| std::path::PathBuf::from("services"));
-    let user_plugins = repositories::list_effective_enriched_plugins(
-        &pool,
-        &user_ctx.user_id,
-        &services_path,
-    )
-    .await;
+    let services_path =
+        super::get_services_path().unwrap_or_else(|_| std::path::PathBuf::from("services"));
+    let user_plugins =
+        repositories::list_effective_enriched_plugins(&pool, &user_ctx.user_id, &services_path)
+            .await;
 
     let (plugins, total_skills, total_agents, total_mcp) =
         collect_marketplace_plugins(&user_plugins);

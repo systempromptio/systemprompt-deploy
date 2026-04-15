@@ -30,7 +30,10 @@ pub async fn list_agents_handler(Extension(user_ctx): Extension<UserContext>) ->
         Ok(a) => a,
         Err(e) => {
             tracing::error!(error = %e, "Failed to list agents");
-            return shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error");
+            return shared::error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error",
+            );
         }
     };
     if user_ctx.is_admin {

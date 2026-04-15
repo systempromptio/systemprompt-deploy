@@ -34,8 +34,7 @@ impl BundleAdminCssJob {
         if failed > 0 {
             return Err(MarketplaceError::Internal(format!(
                 "Failed to read {failed} CSS file(s) during bundling"
-            ))
-            );
+            )));
         }
 
         tokio::fs::write(&bundle_path, &bundle).await.map_err(|e| {

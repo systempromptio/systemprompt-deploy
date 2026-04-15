@@ -43,9 +43,11 @@ fn build_plugin_json(
     for role_name in &known_roles {
         let from_yaml = yaml_roles.iter().any(|r| r == role_name);
         let from_db = entity_rules.is_some_and(|rules| {
-            rules
-                .iter()
-                .any(|r| r.rule_type == RuleType::Role && r.rule_value == *role_name && r.access == AccessDecision::Allow)
+            rules.iter().any(|r| {
+                r.rule_type == RuleType::Role
+                    && r.rule_value == *role_name
+                    && r.access == AccessDecision::Allow
+            })
         });
         if from_yaml || from_db {
             role_names.push((*role_name).to_string());

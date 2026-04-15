@@ -20,7 +20,10 @@ use super::types::{
 };
 
 fn hook_event_type_names() -> Vec<&'static str> {
-    MY_HOOKS_EVENT_TYPES.iter().map(HookEventType::as_str).collect::<Vec<_>>()
+    MY_HOOKS_EVENT_TYPES
+        .iter()
+        .map(HookEventType::as_str)
+        .collect::<Vec<_>>()
 }
 
 pub async fn my_hooks_page(

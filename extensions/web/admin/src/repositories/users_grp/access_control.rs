@@ -37,9 +37,13 @@ pub async fn set_entity_rules(
 ) -> Result<Vec<AccessControlRule>, sqlx::Error> {
     let mut tx = pool.begin().await?;
 
-    sqlx::query!("DELETE FROM access_control_rules WHERE entity_type = $1 AND entity_id = $2", entity_type, entity_id)
-        .execute(&mut *tx)
-        .await?;
+    sqlx::query!(
+        "DELETE FROM access_control_rules WHERE entity_type = $1 AND entity_id = $2",
+        entity_type,
+        entity_id
+    )
+    .execute(&mut *tx)
+    .await?;
 
     let mut results = Vec::new();
     for rule in rules {
@@ -76,9 +80,13 @@ pub async fn bulk_set_rules(
     let mut count = 0usize;
 
     for (entity_type, entity_id) in entities {
-        sqlx::query!("DELETE FROM access_control_rules WHERE entity_type = $1 AND entity_id = $2", entity_type, entity_id)
-            .execute(&mut *tx)
-            .await?;
+        sqlx::query!(
+            "DELETE FROM access_control_rules WHERE entity_type = $1 AND entity_id = $2",
+            entity_type,
+            entity_id
+        )
+        .execute(&mut *tx)
+        .await?;
 
         for rule in rules {
             let id = uuid::Uuid::new_v4().to_string();

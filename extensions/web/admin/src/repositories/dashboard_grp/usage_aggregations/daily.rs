@@ -67,8 +67,8 @@ pub struct SessionSummaryParams<'a> {
 }
 
 pub async fn increment_session_summary(params: &SessionSummaryParams<'_>) {
-    let is_tool_use =
-        params.event_type == EVENT_POST_TOOL_USE || params.event_type == EVENT_POST_TOOL_USE_FAILURE;
+    let is_tool_use = params.event_type == EVENT_POST_TOOL_USE
+        || params.event_type == EVENT_POST_TOOL_USE_FAILURE;
     let is_prompt = params.event_type.contains("UserPromptSubmit");
     let is_error = params.event_type.contains("Failure");
     let tool_inc = i64::from(is_tool_use);

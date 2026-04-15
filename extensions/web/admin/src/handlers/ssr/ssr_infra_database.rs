@@ -123,11 +123,9 @@ async fn fetch_indexes(pool: &PgPool) -> Result<Vec<IndexRow>, sqlx::Error> {
 }
 
 async fn fetch_db_size(pool: &PgPool) -> Result<String, sqlx::Error> {
-    sqlx::query_scalar!(
-        r#"SELECT pg_size_pretty(pg_database_size(current_database())) AS "size!""#
-    )
-    .fetch_one(pool)
-    .await
+    sqlx::query_scalar!(r#"SELECT pg_size_pretty(pg_database_size(current_database())) AS "size!""#)
+        .fetch_one(pool)
+        .await
 }
 
 async fn fetch_db_name(pool: &PgPool) -> Result<String, sqlx::Error> {

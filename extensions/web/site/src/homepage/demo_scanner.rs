@@ -505,7 +505,11 @@ fn extract_commands(content: &str) -> Vec<String> {
                     .strip_prefix(prefix)
                     .map(|args| format!("systemprompt {}", args.trim()))
             })
-            .or_else(|| trimmed.starts_with("systemprompt ").then(|| trimmed.to_string()));
+            .or_else(|| {
+                trimmed
+                    .starts_with("systemprompt ")
+                    .then(|| trimmed.to_string())
+            });
         if let Some(c) = cmd {
             let cleaned = c.trim_end_matches(['\\']).trim().to_string();
             if !cleaned.is_empty() && !out.contains(&cleaned) {

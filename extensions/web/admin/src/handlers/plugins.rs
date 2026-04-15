@@ -31,7 +31,10 @@ pub async fn list_plugins_handler(
         Ok(p) => p,
         Err(e) => {
             tracing::error!(error = %e, "Failed to list plugins");
-            return shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error");
+            return shared::error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error",
+            );
         }
     };
 
@@ -80,7 +83,10 @@ pub async fn list_skills_handler(
         Ok(s) => s,
         Err(e) => {
             tracing::error!(error = %e, "Failed to list skills");
-            return shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error");
+            return shared::error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error",
+            );
         }
     };
     if user_ctx.is_admin {

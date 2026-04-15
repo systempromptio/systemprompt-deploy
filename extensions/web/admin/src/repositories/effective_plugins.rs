@@ -7,8 +7,8 @@ use systemprompt::identifiers::UserId;
 
 use crate::repositories::marketplace_grp::org_marketplaces::resolve_authorized_marketplace_groups;
 use crate::repositories::plugins_grp::plugin_crud_ops::find_plugin_detail;
-use crate::repositories::users_grp::user_plugins::{list_user_plugins_enriched, AssociatedEntity};
 use crate::repositories::users_grp::user_plugins::UserPluginEnriched;
+use crate::repositories::users_grp::user_plugins::{list_user_plugins_enriched, AssociatedEntity};
 use crate::types::UserPlugin;
 
 fn synthesize_org_plugin(
@@ -17,7 +17,9 @@ fn synthesize_org_plugin(
     plugin_id: &str,
     source_marketplace_id: &str,
 ) -> Option<UserPluginEnriched> {
-    let detail = find_plugin_detail(services_path, plugin_id).ok().flatten()?;
+    let detail = find_plugin_detail(services_path, plugin_id)
+        .ok()
+        .flatten()?;
 
     let skills_path = services_path.join("skills");
     let skills: Vec<AssociatedEntity> = detail

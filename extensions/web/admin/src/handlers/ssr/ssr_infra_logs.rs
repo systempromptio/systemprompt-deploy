@@ -33,10 +33,7 @@ pub async fn infra_logs_page(
             .into_response();
     }
 
-    let tab = query
-        .tab
-        .clone()
-        .unwrap_or_else(|| "view".to_string());
+    let tab = query.tab.clone().unwrap_or_else(|| "view".to_string());
 
     let events_query = EventsQuery {
         search: query.search.clone(),

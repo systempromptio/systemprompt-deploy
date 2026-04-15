@@ -39,14 +39,10 @@ pub async fn my_skills_page(
     let (usage_counts, user_plugins, effectiveness, skill_ratings) = tokio::join!(
         repositories::fetch_skill_usage_counts(&pool, &skill_ids),
         async {
-            let services_path = super::get_services_path()
-                .unwrap_or_else(|_| std::path::PathBuf::from("services"));
-            repositories::list_effective_enriched_plugins(
-                &pool,
-                &user_ctx.user_id,
-                &services_path,
-            )
-            .await
+            let services_path =
+                super::get_services_path().unwrap_or_else(|_| std::path::PathBuf::from("services"));
+            repositories::list_effective_enriched_plugins(&pool, &user_ctx.user_id, &services_path)
+                .await
         },
         async {
             conversation_analytics::fetch_skill_effectiveness(&pool, &user_ctx.user_id)

@@ -51,7 +51,9 @@ async fn generate_repo(
         return Ok(repo_path);
     }
 
-    if let Err(e) = crate::repositories::marketplace_sync_status::mark_user_dirty(pool, user_id).await {
+    if let Err(e) =
+        crate::repositories::marketplace_sync_status::mark_user_dirty(pool, user_id).await
+    {
         tracing::warn!(error = %e, "Failed to mark user dirty");
     }
 

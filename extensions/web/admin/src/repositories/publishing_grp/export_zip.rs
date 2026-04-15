@@ -100,8 +100,11 @@ pub struct CoworkExportParams<'a> {
 pub fn build_cowork_plugin_zip(
     params: &CoworkExportParams<'_>,
 ) -> Result<Vec<u8>, MarketplaceError> {
-    let cowork_token =
-        crate::repositories::plugin_jwt::generate_plugin_token(params.user_id, params.email, "cowork-bundle")?;
+    let cowork_token = crate::repositories::plugin_jwt::generate_plugin_token(
+        params.user_id,
+        params.email,
+        "cowork-bundle",
+    )?;
 
     let mut merged_files = collect_merged_files(params.response);
     append_merged_mcp_config(params.response, &mut merged_files);
@@ -132,7 +135,9 @@ pub fn build_cowork_plugin_zip(
     build_plugin_zip(&merged_bundle)
 }
 
-fn collect_merged_files(response: &SyncPluginsResponse) -> Vec<crate::repositories::export::PluginFile> {
+fn collect_merged_files(
+    response: &SyncPluginsResponse,
+) -> Vec<crate::repositories::export::PluginFile> {
     use crate::repositories::export::PluginFile;
 
     let mut files: Vec<PluginFile> = Vec::new();
@@ -193,7 +198,11 @@ fn append_merged_mcp_config(
     }
 }
 
-fn append_env_plugin(token: &str, platform_url: &str, files: &mut Vec<crate::repositories::export::PluginFile>) {
+fn append_env_plugin(
+    token: &str,
+    platform_url: &str,
+    files: &mut Vec<crate::repositories::export::PluginFile>,
+) {
     files.push(crate::repositories::export::PluginFile {
         path: ".env.plugin".to_string(),
         content: format!(
@@ -203,7 +212,11 @@ fn append_env_plugin(token: &str, platform_url: &str, files: &mut Vec<crate::rep
     });
 }
 
-fn append_cowork_manifest(username: &str, email: &str, files: &mut Vec<crate::repositories::export::PluginFile>) {
+fn append_cowork_manifest(
+    username: &str,
+    email: &str,
+    files: &mut Vec<crate::repositories::export::PluginFile>,
+) {
     use crate::repositories::export::{ManifestAuthor, PluginManifest};
 
     let sanitized: String = username

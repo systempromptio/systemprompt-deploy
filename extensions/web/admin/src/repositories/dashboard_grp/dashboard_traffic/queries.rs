@@ -1,8 +1,8 @@
 use sqlx::PgPool;
 
 use crate::types::{
-    ContentPerformanceRow, RealtimePulse, TrafficCountryBucket, TrafficTopPage,
-    TRAFFIC_RANGE_30D, TRAFFIC_RANGE_YESTERDAY,
+    ContentPerformanceRow, RealtimePulse, TrafficCountryBucket, TrafficTopPage, TRAFFIC_RANGE_30D,
+    TRAFFIC_RANGE_YESTERDAY,
 };
 
 pub async fn fetch_realtime_pulse(pool: &PgPool) -> Result<RealtimePulse, sqlx::Error> {

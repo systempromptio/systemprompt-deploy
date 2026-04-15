@@ -81,7 +81,9 @@ fn build_marketplace_json(
         .map(|role_name| {
             let assigned = entity_rules.is_some_and(|rules| {
                 rules.iter().any(|r| {
-                    r.rule_type == RuleType::Role && r.rule_value == *role_name && r.access == AccessDecision::Allow
+                    r.rule_type == RuleType::Role
+                        && r.rule_value == *role_name
+                        && r.access == AccessDecision::Allow
                 })
             });
             if assigned {

@@ -42,5 +42,11 @@ pub async fn governance_rate_limits_page(
         "has_tiers": true,
     });
 
-    super::render_page(&engine, "governance-rate-limits", &data, &user_ctx, &mkt_ctx)
+    super::render_page(
+        &engine,
+        "governance-rate-limits",
+        &data,
+        &user_ctx,
+        &mkt_ctx,
+    )
 }

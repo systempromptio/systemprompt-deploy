@@ -261,8 +261,7 @@ async fn update_plugin_mcp_servers(
         }
     };
 
-    if let Err(e) =
-        repositories::user_plugins::set_plugin_mcp_servers(pool, &plugin.id, ids).await
+    if let Err(e) = repositories::user_plugins::set_plugin_mcp_servers(pool, &plugin.id, ids).await
     {
         tracing::error!(error = %e, "Failed to set plugin MCP servers");
         return Err(shared::error_response(

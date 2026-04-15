@@ -13,7 +13,9 @@ pub use error::GitSyncError;
 use types::PluginImportTally;
 pub use types::SyncResult;
 
-pub(crate) use crate::repositories::github_sync_bundle::{build_bundle_from_directory, import_or_update_plugin};
+pub(crate) use crate::repositories::github_sync_bundle::{
+    build_bundle_from_directory, import_or_update_plugin,
+};
 pub(crate) use crate::repositories::github_sync_git::{git_clone_shallow, git_head_hash, git_pull};
 
 pub use crate::repositories::github_sync_publish::publish_marketplace_to_github;
@@ -121,8 +123,12 @@ async fn finalize_sync(
     error_count: &mut u64,
 ) {
     if !plugin_ids.is_empty() {
-        if let Err(e) =
-            crate::repositories::org_marketplaces::set_marketplace_plugins(pool, marketplace_id, plugin_ids).await
+        if let Err(e) = crate::repositories::org_marketplaces::set_marketplace_plugins(
+            pool,
+            marketplace_id,
+            plugin_ids,
+        )
+        .await
         {
             tracing::error!(error = %e, "Failed to update marketplace plugin associations");
             *error_count += 1;
@@ -245,9 +251,7 @@ fn read_marketplace_plugins(local_path: &Path) -> Result<Vec<serde_json::Value>,
         .get("plugins")
         .and_then(|v| v.as_array())
         .cloned()
-        .ok_or_else(|| {
-            GitSyncError::Validation("marketplace.json missing 'plugins' array".into())
-        })
+        .ok_or_else(|| GitSyncError::Validation("marketplace.json missing 'plugins' array".into()))
 }
 
 struct SyncLogInput<'a> {

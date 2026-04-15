@@ -154,11 +154,13 @@ pub async fn search_user_entity_activity(
 
         Ok((rows, total))
     } else {
-        let total: i64 =
-            sqlx::query_scalar!("SELECT COUNT(*)::BIGINT FROM user_activity WHERE user_id = $1", user_id)
-                .fetch_one(pool)
-                .await?
-                .unwrap_or(0);
+        let total: i64 = sqlx::query_scalar!(
+            "SELECT COUNT(*)::BIGINT FROM user_activity WHERE user_id = $1",
+            user_id
+        )
+        .fetch_one(pool)
+        .await?
+        .unwrap_or(0);
 
         let rows = sqlx::query_as::<_, ActivityTimelineEvent>(
             r"SELECT a.id, a.user_id,
@@ -202,8 +204,11 @@ pub async fn get_user_entity_activity(
 }
 
 pub async fn count_user_entity_activity(pool: &PgPool, user_id: &str) -> Result<i64, sqlx::Error> {
-    Ok(sqlx::query_scalar!("SELECT COUNT(*)::BIGINT FROM user_activity WHERE user_id = $1", user_id)
-        .fetch_one(pool)
-        .await?
-        .unwrap_or(0))
+    Ok(sqlx::query_scalar!(
+        "SELECT COUNT(*)::BIGINT FROM user_activity WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(pool)
+    .await?
+    .unwrap_or(0))
 }

@@ -52,10 +52,7 @@ fn list_config_files(dir: &std::path::Path) -> Vec<serde_json::Value> {
         if !path.is_file() {
             continue;
         }
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("");
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
         let size = entry.metadata().map(|m| m.len()).unwrap_or(0);
         let valid = match ext {
             "yaml" | "yml" => std::fs::read_to_string(&path)

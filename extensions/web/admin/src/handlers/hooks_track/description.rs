@@ -36,7 +36,9 @@ fn describe_user_prompt(d: &crate::types::webhook::UserPromptSubmitData) -> Cow<
     }
 }
 
-fn describe_post_tool_failure(d: &crate::types::webhook::PostToolUseFailureData) -> Cow<'static, str> {
+fn describe_post_tool_failure(
+    d: &crate::types::webhook::PostToolUseFailureData,
+) -> Cow<'static, str> {
     let tool = if d.tool_name.is_empty() {
         "unknown"
     } else {
@@ -64,7 +66,9 @@ fn describe_post_tool_use(d: &crate::types::webhook::PostToolUseData) -> Cow<'st
     ))
 }
 
-fn describe_permission_request(d: &crate::types::webhook::PermissionRequestData) -> Cow<'static, str> {
+fn describe_permission_request(
+    d: &crate::types::webhook::PermissionRequestData,
+) -> Cow<'static, str> {
     let tool = if d.tool_name.is_empty() {
         "unknown"
     } else {
@@ -132,7 +136,10 @@ fn describe_notification(d: &crate::types::webhook::NotificationData) -> Cow<'st
     if d.message.is_empty() {
         Cow::Owned(format!("Notification ({ntype})"))
     } else {
-        Cow::Owned(format!("Notification ({ntype}): {}", truncate(&d.message, 80)))
+        Cow::Owned(format!(
+            "Notification ({ntype}): {}",
+            truncate(&d.message, 80)
+        ))
     }
 }
 
@@ -165,10 +172,15 @@ fn describe_pre_compact(d: &crate::types::webhook::PreCompactData) -> Cow<'stati
     Cow::Owned(format!("Context compaction ({trigger})"))
 }
 
-fn describe_instructions_loaded(d: &crate::types::webhook::InstructionsLoadedData) -> Cow<'static, str> {
+fn describe_instructions_loaded(
+    d: &crate::types::webhook::InstructionsLoadedData,
+) -> Cow<'static, str> {
     if d.load_reason.is_empty() {
         Cow::Owned(format!("Instructions loaded: {}", d.file_path))
     } else {
-        Cow::Owned(format!("Instructions loaded ({}): {}", d.load_reason, d.file_path))
+        Cow::Owned(format!(
+            "Instructions loaded ({}): {}",
+            d.load_reason, d.file_path
+        ))
     }
 }

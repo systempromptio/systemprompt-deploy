@@ -62,12 +62,15 @@ async fn load_skill_content(
 
     match from_db {
         Some(content) => Ok(content),
-        None => skill_loader.load_skill(&SkillId::new(skill_id.to_string()), ctx).await.map_err(|e| {
-            McpError::internal_error(
-                format!("Skill '{skill_id}' not found in user skills or skill registry: {e}"),
-                None,
-            )
-        }),
+        None => skill_loader
+            .load_skill(&SkillId::new(skill_id.to_string()), ctx)
+            .await
+            .map_err(|e| {
+                McpError::internal_error(
+                    format!("Skill '{skill_id}' not found in user skills or skill registry: {e}"),
+                    None,
+                )
+            }),
     }
 }
 

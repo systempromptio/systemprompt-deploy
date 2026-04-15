@@ -2,10 +2,6 @@ use std::fmt::Write;
 
 use sqlx::PgPool;
 
-use crate::types::{
-    ContentPerformanceRow, DashboardData, EventBreakdown, EventRow, EventsQuery, EventsResponse,
-    RealtimePulse, RecentMcpError, TrafficData, TrafficTopPage,
-};
 use crate::repositories::dashboard_aggregates::{
     fetch_active_users_24h, fetch_usage_timeseries, get_activity_stats,
 };
@@ -14,6 +10,10 @@ use crate::repositories::dashboard_queries::{
     fetch_tool_success_rates, fetch_top_users,
 };
 use crate::repositories::dashboard_traffic;
+use crate::types::{
+    ContentPerformanceRow, DashboardData, EventBreakdown, EventRow, EventsQuery, EventsResponse,
+    RealtimePulse, RecentMcpError, TrafficData, TrafficTopPage,
+};
 
 pub async fn get_dashboard_data(
     pool: &PgPool,

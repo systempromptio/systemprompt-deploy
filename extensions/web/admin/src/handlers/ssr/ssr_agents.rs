@@ -96,9 +96,13 @@ fn build_agent_json(
         })
         .unwrap_or_default();
 
-    let skill_count =
-        count_entities_via_plugins(agent.id.as_str(), ctx.agent_plugin_map, ctx.skill_plugin_map);
-    let mcp_count = count_entities_via_plugins(agent.id.as_str(), ctx.agent_plugin_map, ctx.mcp_plugin_map);
+    let skill_count = count_entities_via_plugins(
+        agent.id.as_str(),
+        ctx.agent_plugin_map,
+        ctx.skill_plugin_map,
+    );
+    let mcp_count =
+        count_entities_via_plugins(agent.id.as_str(), ctx.agent_plugin_map, ctx.mcp_plugin_map);
 
     let prompt_preview = if agent.system_prompt.len() > 300 {
         format!("{}...", &agent.system_prompt[..300])
@@ -112,7 +116,11 @@ fn build_agent_json(
         }
     }
 
-    let usage_count = ctx.usage_counts.get(agent.id.as_str()).copied().unwrap_or(0);
+    let usage_count = ctx
+        .usage_counts
+        .get(agent.id.as_str())
+        .copied()
+        .unwrap_or(0);
     let updated_at = ctx
         .agent_updated_at
         .get(agent.id.as_str())

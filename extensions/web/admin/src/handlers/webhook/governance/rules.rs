@@ -140,9 +140,7 @@ fn evaluate_scope(
         rules.push(EvaluatedRule {
             rule: "scope_check",
             result: "warn",
-            detail: Cow::Borrowed(
-                "Agent scope could not be resolved; allowed for non-admin tool",
-            ),
+            detail: Cow::Borrowed("Agent scope could not be resolved; allowed for non-admin tool"),
         });
     } else {
         rules.push(EvaluatedRule {
@@ -220,12 +218,16 @@ fn evaluate_rate_limit(
 
     if count >= limit {
         *denied = true;
-        *deny_reason = Cow::Owned(format!("Rate limit exceeded: {count}/{limit} calls this minute"));
+        *deny_reason = Cow::Owned(format!(
+            "Rate limit exceeded: {count}/{limit} calls this minute"
+        ));
         *deny_policy = Cow::Borrowed("rate_limit");
         rules.push(EvaluatedRule {
             rule: "rate_limit",
             result: "fail",
-            detail: Cow::Owned(format!("{count}/{limit} calls this minute — limit exceeded")),
+            detail: Cow::Owned(format!(
+                "{count}/{limit} calls this minute — limit exceeded"
+            )),
         });
     } else {
         rules.push(EvaluatedRule {

@@ -7,7 +7,9 @@ use crate::repositories::export_resolvers::{
     build_agent_md, build_skill_md, collect_skill_auxiliary_files, resolve_export_agents,
     resolve_export_skills,
 };
-use crate::repositories::export_validation::{build_manifest, compute_content_version, validate_bundle};
+use crate::repositories::export_validation::{
+    build_manifest, compute_content_version, validate_bundle,
+};
 use systemprompt_web_shared::error::MarketplaceError;
 
 pub(super) struct PluginBuildContext<'a> {
@@ -115,7 +117,8 @@ fn build_mcp_files(
     }
     let mut mcp_server_entries = std::collections::HashMap::new();
     for mcp_name in &plugin.mcp_servers {
-        let Ok(Some(server_detail)) = crate::repositories::mcp_servers::find_mcp_server(services_path, mcp_name)
+        let Ok(Some(server_detail)) =
+            crate::repositories::mcp_servers::find_mcp_server(services_path, mcp_name)
         else {
             tracing::warn!(mcp_server = %mcp_name, "MCP server not found during plugin export, skipping");
             continue;

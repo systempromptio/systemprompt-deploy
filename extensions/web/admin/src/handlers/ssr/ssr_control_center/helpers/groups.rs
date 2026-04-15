@@ -5,7 +5,9 @@ use sqlx::PgPool;
 use crate::repositories;
 use crate::repositories::control_center;
 use crate::repositories::session_analyses::SessionAnalysisRow;
-use crate::types::{ENTITY_AGENT, ENTITY_MCP_TOOL, ENTITY_SKILL, PERMISSION_MODE_PLAN, STATUS_ACTIVE};
+use crate::types::{
+    ENTITY_AGENT, ENTITY_MCP_TOOL, ENTITY_SKILL, PERMISSION_MODE_PLAN, STATUS_ACTIVE,
+};
 
 use super::super::session_groups::build_session_groups_with_status;
 use super::super::types::SessionGroup;
@@ -98,10 +100,8 @@ fn inject_analysis_data(
         if let Some(session) = sessions_map.get(&group.session_id) {
             group.content_bytes = session.content_input_bytes + session.content_output_bytes;
 
-            group.client_source_label =
-                format_client_source(&session.client_source).to_string();
-            group.client_source_class =
-                client_source_class(&session.client_source).to_string();
+            group.client_source_label = format_client_source(&session.client_source).to_string();
+            group.client_source_class = client_source_class(&session.client_source).to_string();
             group.client_source = session.client_source.clone();
 
             group.flags.is_plan_mode = session.permission_mode == PERMISSION_MODE_PLAN;

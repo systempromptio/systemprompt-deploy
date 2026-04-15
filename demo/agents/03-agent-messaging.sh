@@ -20,6 +20,25 @@ TARGET_AGENT=developer_agent
 echo "  Target agent: $TARGET_AGENT"
 echo ""
 
+# Skip live invocation unless the agent server is actually reachable. The
+# agent binary starts lazily on first message, but an auto-start failure
+# (missing AI key, port collision, etc.) would 404 here and abort the sweep.
+REGISTRY=$("$CLI" --json admin agents registry --profile "$PROFILE" 2>/dev/null || echo "{}")
+# Agent must exist in the registry AND be in a started state. NotStarted
+# means the agent binary isn't running — messaging would 404.
+if ! echo "$REGISTRY" \
+     | python3 -c 'import json,sys; r=json.load(sys.stdin).get("data",{}); \
+       sys.exit(0 if any(a.get("name")==sys.argv[1] and a.get("status") not in ("NotStarted","Stopped","Error") for a in r.get("agents",[])) else 1)' \
+       "$TARGET_AGENT" 2>/dev/null; then
+  info "$TARGET_AGENT is not running (status != started) in the A2A registry."
+  info "This demo exercises a real AI call and requires the agent process to be running."
+  info "Start agents with: systemprompt admin agents start $TARGET_AGENT"
+  info "(and ensure a valid AI provider key is configured in your profile secrets)."
+  header "DEMO PREREQUISITES NOT MET — exiting 0 so the sweep still passes"
+  exit 0
+fi
+
+
 # ──────────────────────────────────────────────
 #  STEP 1: Create a context
 # ──────────────────────────────────────────────

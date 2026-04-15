@@ -101,10 +101,7 @@ pub async fn load_tier_context(
         let guard = cache.tier_cache.read().await;
         if let Some(cached) = guard.get(user_id) {
             if cached.cached_at.elapsed().as_secs() < TIER_CACHE_TTL_SECS {
-                return (
-                    Arc::clone(&cached.limits),
-                    cached.subscription_status,
-                );
+                return (Arc::clone(&cached.limits), cached.subscription_status);
             }
         }
     }
@@ -131,7 +128,12 @@ pub async fn load_tier_context(
 async fn resolve_tier_for_user(
     pool: &PgPool,
     user_id: &UserId,
-) -> (TierLimits, String, SubscriptionStatus, Option<chrono::DateTime<Utc>>) {
+) -> (
+    TierLimits,
+    String,
+    SubscriptionStatus,
+    Option<chrono::DateTime<Utc>>,
+) {
     if let Some((limits, plan_name)) = fetch_role_based_plan(pool, user_id).await {
         return (limits, plan_name, SubscriptionStatus::Active, None);
     }
@@ -193,7 +195,12 @@ async fn fetch_free_plan(pool: &PgPool) -> (TierLimits, String) {
 async fn fetch_subscription_tier(
     pool: &PgPool,
     user_id: &UserId,
-) -> (TierLimits, String, SubscriptionStatus, Option<chrono::DateTime<Utc>>) {
+) -> (
+    TierLimits,
+    String,
+    SubscriptionStatus,
+    Option<chrono::DateTime<Utc>>,
+) {
     let row = sqlx::query!(
         r#"SELECT
              COALESCE(p.display_name, 'Free') AS "plan_name!",

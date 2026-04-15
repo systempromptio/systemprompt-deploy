@@ -170,7 +170,8 @@ pub async fn restore_skills_from_snapshot(
 }
 
 pub fn invalidate_git_cache(user_id: &UserId) -> Result<(), std::io::Error> {
-    let cache_dir = PathBuf::from(crate::repositories::marketplace_git::CACHE_DIR).join(user_id.as_str());
+    let cache_dir =
+        PathBuf::from(crate::repositories::marketplace_git::CACHE_DIR).join(user_id.as_str());
     if cache_dir.exists() {
         std::fs::remove_dir_all(&cache_dir)?;
     }

@@ -32,10 +32,7 @@ pub struct SystempromptServer {
 }
 
 impl SystempromptServer {
-    pub fn new(
-        db_pool: DbPool,
-        service_id: McpServerId,
-    ) -> Result<Self, SystempromptToolError> {
+    pub fn new(db_pool: DbPool, service_id: McpServerId) -> Result<Self, SystempromptToolError> {
         let tool_usage_repo = Arc::new(
             ToolUsageRepository::new(&db_pool)
                 .map_err(|e| SystempromptToolError::Internal(e.to_string()))?,

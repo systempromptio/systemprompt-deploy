@@ -138,7 +138,9 @@ fn build_roles_json(
             let from_yaml = yaml_roles.is_some_and(|yr| yr.iter().any(|r| r == role_name));
             let from_db = entity_rules.is_some_and(|rules| {
                 rules.iter().any(|r| {
-                    r.rule_type == RuleType::Role && r.rule_value == *role_name && r.access == AccessDecision::Allow
+                    r.rule_type == RuleType::Role
+                        && r.rule_value == *role_name
+                        && r.access == AccessDecision::Allow
                 })
             });
             let assigned = from_yaml || from_db;
