@@ -38,9 +38,7 @@ pub fn build_bundle_from_directory(plugin_dir: &Path) -> Result<PluginBundle, Gi
     })
 }
 
-fn read_plugin_manifest(
-    plugin_dir: &Path,
-) -> Result<(String, serde_json::Value), GitSyncError> {
+fn read_plugin_manifest(plugin_dir: &Path) -> Result<(String, serde_json::Value), GitSyncError> {
     let plugin_json_path = plugin_dir.join(".claude-plugin/plugin.json");
     let manifest_content = std::fs::read_to_string(&plugin_json_path)?;
     let manifest: serde_json::Value = serde_json::from_str(&manifest_content)?;
@@ -126,9 +124,10 @@ pub fn collect_directory_files(
         .filter_map(Result::ok)
         .filter(|e| e.file_type().is_file())
     {
-        let rel_path = entry.path().strip_prefix(dir).map_err(|e| {
-            GitSyncError::Validation(format!("Failed to strip prefix: {e}"))
-        })?;
+        let rel_path = entry
+            .path()
+            .strip_prefix(dir)
+            .map_err(|e| GitSyncError::Validation(format!("Failed to strip prefix: {e}")))?;
         let path = format!("{prefix}/{}", rel_path.display());
         let content = std::fs::read_to_string(entry.path())?;
         files.push(PluginFile {

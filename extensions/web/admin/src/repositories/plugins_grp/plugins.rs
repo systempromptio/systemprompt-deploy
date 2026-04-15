@@ -3,10 +3,10 @@ use std::path::Path;
 
 use systemprompt::identifiers::{McpServerId, SkillId};
 
-use crate::types::{PluginOnboardingConfig, PluginOverview, ROLE_ADMIN};
 use crate::repositories::plugin_resolvers::{
     resolve_all_plugin_skill_ids, resolve_plugin_agents, resolve_plugin_skills,
 };
+use crate::types::{PluginOnboardingConfig, PluginOverview, ROLE_ADMIN};
 use systemprompt_web_shared::error::MarketplaceError;
 
 pub fn list_all_skill_ids(services_path: &Path) -> Result<Vec<String>, MarketplaceError> {
@@ -37,12 +37,15 @@ pub fn list_plugin_skill_ids(
     services_path: &Path,
     plugin_id: &str,
 ) -> Result<Vec<String>, MarketplaceError> {
-    let plugin = super::plugin_loader::find_plugin(plugin_id)?.ok_or_else(|| {
-        MarketplaceError::NotFound(format!("Plugin not found: {plugin_id}"))
-    })?;
+    let plugin = super::plugin_loader::find_plugin(plugin_id)?
+        .ok_or_else(|| MarketplaceError::NotFound(format!("Plugin not found: {plugin_id}")))?;
     let skills_path = services_path.join("skills");
     let agents_path = services_path.join("agents");
-    Ok(resolve_all_plugin_skill_ids(&plugin, &skills_path, &agents_path))
+    Ok(resolve_all_plugin_skill_ids(
+        &plugin,
+        &skills_path,
+        &agents_path,
+    ))
 }
 
 pub fn update_plugin_skills(

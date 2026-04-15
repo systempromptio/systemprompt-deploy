@@ -25,8 +25,10 @@ pub fn _load_authorized_plugin_configs(
         .cloned()
         .collect();
 
-    let mut seen_ids: std::collections::HashSet<String> =
-        authorized.iter().map(|(_, p)| p.base.id.to_string()).collect();
+    let mut seen_ids: std::collections::HashSet<String> = authorized
+        .iter()
+        .map(|(_, p)| p.base.id.to_string())
+        .collect();
     let mut i = 0;
     while i < authorized.len() {
         let deps = authorized[i].1.depends.clone();
@@ -34,7 +36,10 @@ pub fn _load_authorized_plugin_configs(
             if seen_ids.contains(dep_id) {
                 continue;
             }
-            if let Some(dep) = all_plugins.iter().find(|(_, p)| p.base.id.as_str() == dep_id) {
+            if let Some(dep) = all_plugins
+                .iter()
+                .find(|(_, p)| p.base.id.as_str() == dep_id)
+            {
                 if !dep.1.base.enabled {
                     return Err(MarketplaceError::Internal(format!(
                         "Plugin '{}' depends on '{}' which is disabled",
@@ -69,8 +74,10 @@ pub fn load_plugin_configs_by_ids(
         .cloned()
         .collect();
 
-    let mut seen_ids: std::collections::HashSet<String> =
-        authorized.iter().map(|(_, p)| p.base.id.to_string()).collect();
+    let mut seen_ids: std::collections::HashSet<String> = authorized
+        .iter()
+        .map(|(_, p)| p.base.id.to_string())
+        .collect();
     let mut i = 0;
     while i < authorized.len() {
         let deps = authorized[i].1.depends.clone();
@@ -78,7 +85,10 @@ pub fn load_plugin_configs_by_ids(
             if seen_ids.contains(dep_id) {
                 continue;
             }
-            if let Some(dep) = all_plugins.iter().find(|(_, p)| p.base.id.as_str() == dep_id) {
+            if let Some(dep) = all_plugins
+                .iter()
+                .find(|(_, p)| p.base.id.as_str() == dep_id)
+            {
                 if !dep.1.base.enabled {
                     return Err(MarketplaceError::Internal(format!(
                         "Plugin '{}' depends on '{}' which is disabled",
@@ -100,4 +110,3 @@ pub fn load_plugin_configs_by_ids(
     authorized.sort_by(|a, b| a.0.cmp(&b.0));
     Ok(authorized)
 }
-

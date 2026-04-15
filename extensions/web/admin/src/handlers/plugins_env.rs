@@ -42,7 +42,10 @@ pub async fn list_plugin_env_handler(
         Ok(vars) => vars,
         Err(e) => {
             tracing::error!(error = %e, "Failed to list plugin env vars");
-            return shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error");
+            return shared::error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error",
+            );
         }
     };
 
@@ -104,7 +107,10 @@ pub async fn update_plugin_env_handler(
         .await
         {
             tracing::error!(error = %e, "Failed to upsert plugin env var");
-            return shared::error_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error");
+            return shared::error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error",
+            );
         }
     }
 

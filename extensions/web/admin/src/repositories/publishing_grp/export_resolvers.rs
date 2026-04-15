@@ -28,8 +28,7 @@ pub(super) fn resolve_export_skills(
             if path.extension().and_then(|e| e.to_str()) != Some("yaml") {
                 continue;
             }
-            let Some(skill_id) = path.file_stem().and_then(|s| s.to_str()).map(String::from)
-            else {
+            let Some(skill_id) = path.file_stem().and_then(|s| s.to_str()).map(String::from) else {
                 continue;
             };
             if plugin.skills.exclude.contains(&skill_id) {
@@ -106,7 +105,7 @@ fn strip_frontmatter(content: &str) -> String {
     }
 }
 
-pub(super) fn collect_skill_auxiliary_files(
+pub(super) const fn collect_skill_auxiliary_files(
     _skill_id: &str,
     _skill_yaml_path: &Path,
 ) -> Vec<(String, String, bool)> {
