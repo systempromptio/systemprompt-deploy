@@ -22,17 +22,27 @@
 
 ---
 
-## This is the local evaluation
+**AI governance infrastructure for agentic systems.** A single compiled Rust binary that authenticates, authorises, rate-limits, logs, and costs every AI interaction before it reaches a tool, a database, or an external service. Self-hosted, air-gap capable, provider-agnostic. One binary (~50 MB). One database (PostgreSQL). No microservices. No Kubernetes. No Redis. No Kafka.
 
-**systemprompt.io is AI Governance Infrastructure** — the governance layer for AI agents. A single compiled Rust binary that authenticates, authorises, rate-limits, logs, and costs every AI interaction. Self-hosted, air-gap capable, provider-agnostic.
+This repo is how you evaluate it. Clone it, run it on your own machine, bring your own AI key, and watch every claim on this page execute against 40+ scripted demos. The terminal recordings below are real captures of those demos running, not mockups.
 
-This repo is how you evaluate it. Clone it, run it on your own machine, bring your own AI key, and watch every claim below execute against 40+ scripted demos. **The terminal recordings are real captures of those demos running — not mockups.**
+> **Ready to evaluate?** Three commands from fresh clone to running platform. Every recording on this page is a real script you can run yourself.
+>
+> **Looking at the source?** This template is MIT. The engine is [systemprompt-core](https://github.com/systempromptio/systemprompt-core) (BSL-1.1), a 30-crate Rust workspace published on crates.io under `systemprompt-*`.
 
-> Template: MIT. [systemprompt-core](https://github.com/systempromptio/systemprompt-core): BSL-1.1 — free for evaluation and non-production use. Production requires a commercial license.
+## Table of Contents
+
+- [Get started](#get-started)
+- [Infrastructure](#infrastructure) — Self-hosted deployment, deploy anywhere, unified control plane, open standards
+- [Capabilities](#capabilities) — Governance pipeline, secrets management, MCP governance, analytics, agents, compliance
+- [Integrations](#integrations) — Any AI agent, Claude Desktop & Cowork, web publisher, extensible architecture
+- [Performance](#performance)
+- [Configuration](#configuration)
+- [License](#license)
 
 ---
 
-## Evaluate it in three commands
+## Get started
 
 ```bash
 just build                                               # 1. compile the workspace
@@ -40,13 +50,13 @@ just setup-local <anthropic> <openai> <gemini>           # 2. profile + Postgres
 just start                                               # 3. serve governance, agents, MCP, admin, API
 ```
 
-Open **http://localhost:8080** and run `systemprompt --help`. Point Claude Code, Claude Desktop, or any MCP client at it — permissions follow the user, not the client.
+Open **http://localhost:8080** and run `systemprompt --help`. Point Claude Code, Claude Desktop, or any MCP client at it. Permissions follow the user, not the client.
 
 ### Prerequisites
 
 | Requirement | Purpose | Install |
 |---|---|---|
-| **Docker** | PostgreSQL runs in a container — `just setup-local` starts it automatically | [docker.com](https://docs.docker.com/get-docker/) |
+| **Docker** | PostgreSQL runs in a container. `just setup-local` starts it automatically | [docker.com](https://docs.docker.com/get-docker/) |
 | **Rust 1.75+** | Compiles the workspace binary | [rustup.rs](https://rustup.rs/) |
 | **`just`** | Task runner for build, setup, and start commands | [just.systems](https://just.systems/) |
 | **`jq`** | JSON processing for config and session management | `brew install jq` / `apt install jq` |
@@ -60,7 +70,24 @@ Running a second clone side-by-side? `just setup-local <key> "" "" 8081 5433`.
 
 ## Infrastructure
 
-One binary. One database. Deploys anywhere.
+**One binary. One database. Deploys anywhere.** What others assemble from six services, this ships as a single 50MB Rust binary with PostgreSQL as the only dependency. Four in-process services, 144 database tables, zero sidecars, one PID to monitor. The same artifact runs on Docker, bare metal, cloud, or an air-gapped network without modification.
+
+Configuration is profile-based YAML checked into version control. Agents, MCP servers, skills, AI providers, content sources, scheduler jobs, and web themes all live as flat files under `services/`. Environment drift is a diff, not a mystery. Every operation that works against localhost takes a `--profile` flag and works identically against staging or production.
+
+Eight CLI domains cover every operational surface. No dashboard required for any task:
+
+| Domain | Purpose |
+|---|---|
+| `core` | Skills, content, files, contexts, plugins, hooks, artifacts |
+| `infra` | Services, database, jobs, logs |
+| `admin` | Users, agents, config, setup, session, rate limits |
+| `cloud` | Auth, deploy, sync, secrets, tenant, domain |
+| `analytics` | Overview, conversations, agents, tools, requests, sessions, content, traffic, costs |
+| `web` | Content types, templates, assets, sitemap, validate |
+| `plugins` | Extensions, MCP servers, capabilities |
+| `build` | Build core workspace and MCP extensions |
+
+Every layer uses an open standard: **MCP** for tool communication, **OAuth 2.0** and **WebAuthn** for identity, **ChaCha20-Poly1305** for encryption at rest, **PostgreSQL** for storage, **Git** for distribution. No proprietary protocols at any layer. You can leave without a migration.
 
 ### Self-hosted deployment
 
@@ -70,7 +97,7 @@ One binary. One database. Deploys anywhere.
   <img src="demo/recording/svg/output/dark/infra-self-hosted.svg" alt="Self-hosted deployment — terminal recording" width="820">
 </picture>
 
-> 50MB Rust binary, 4 in-process services, 144 database tables, zero sidecars. → [`svg-infra-self-hosted.sh`](demo/recording/svg/svg-infra-self-hosted.sh) · [Learn more](https://systemprompt.io/features/self-hosted-ai-platform)
+> One binary, one process, one database. All data stays on your infrastructure. No outbound telemetry. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-self--hosted-2b6cb0?style=flat-square)](https://systemprompt.io/features/self-hosted-ai-platform)
 
 ### Deploy anywhere
 
@@ -80,9 +107,9 @@ One binary. One database. Deploys anywhere.
   <img src="demo/recording/svg/output/dark/infra-deploy-anywhere.svg" alt="Deploy anywhere — terminal recording" width="820">
 </picture>
 
-> Same binary runs local, Docker, cloud, or air-gapped. Config follows the profile. → [`svg-infra-deploy-anywhere.sh`](demo/recording/svg/svg-infra-deploy-anywhere.sh) · [Learn more](https://systemprompt.io/features/self-hosted-ai-platform)
+> Profile-based config means the same binary promotes from laptop to production without rebuilding. JWT validation and rate limiting execute locally per process without distributed infrastructure. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-deploy%20anywhere-2b6cb0?style=flat-square)](https://systemprompt.io/features/deploy-anywhere)
 
-### One CLI, every domain
+### Unified control plane
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/infra-control-plane.svg">
@@ -90,9 +117,9 @@ One binary. One database. Deploys anywhere.
   <img src="demo/recording/svg/output/dark/infra-control-plane.svg" alt="Unified control plane — terminal recording" width="820">
 </picture>
 
-> 8 domains — govern, observe, manage — all from one binary, one CLI. → [`svg-infra-control-plane.sh`](demo/recording/svg/svg-infra-control-plane.sh)
+> Govern, observe, and manage from one binary. `systemprompt <domain> --help` works everywhere. The same CLI surface drives local dev and production operations. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-control%20plane-2b6cb0?style=flat-square)](https://systemprompt.io/features/unified-control-plane)
 
-### Every layer, an open standard
+### Open standards
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/infra-open-standards.svg">
@@ -100,13 +127,17 @@ One binary. One database. Deploys anywhere.
   <img src="demo/recording/svg/output/dark/infra-open-standards.svg" alt="Open standards — terminal recording" width="820">
 </picture>
 
-> MCP, OAuth 2.0, JWT, PostgreSQL, YAML — zero proprietary protocols at any layer. → [`svg-infra-open-standards.sh`](demo/recording/svg/svg-infra-open-standards.sh) · [Learn more](https://systemprompt.io/features/no-vendor-lock-in)
+> MCP for tools, OAuth 2.0 for identity, PostgreSQL for storage, Git for distribution. Zero proprietary protocols at any layer. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-open%20standards-2b6cb0?style=flat-square)](https://systemprompt.io/features/no-vendor-lock-in)
 
 ---
 
 ## Capabilities
 
-Four enforcement layers. Full audit trail. Zero blind spots.
+**Every tool call governed. Synchronous evaluation before execution, not after.** Four layers of enforcement in the request path: scope check against a six-tier RBAC hierarchy (Admin 10x, User 1x, Service 5x, A2A 5x, MCP 5x, Anonymous 0.5x), secret detection with 35+ regex patterns, blocklist for destructive operations, and rate limiting at 300 requests per minute per session with role-based multipliers. Deny reasons are structured and auditable. Single-digit milliseconds overhead. No sidecar. No proxy.
+
+**Secrets never touch inference.** The agent calls the tool, the MCP service injects the credential server-side via subprocess environment variables, and the LLM never sees it. Per-user key hierarchy encrypted with ChaCha20-Poly1305 AEAD. 12 dangerous file extensions blocked at the edge. 20+ scanner tool signatures identified before they reach the application layer.
+
+**Every decision lands in an 18-column audit table** with 17 indexes, queryable from the CLI or exportable to your SIEM via structured JSON events. Cost tracking in integer microdollars by model, agent, and department. Nothing is sampled. Nothing is approximate. A single TraceId correlates every event from login through model output. Six correlation columns (UserId, SessionId, TaskId, TraceId, ContextId, ClientId) bind identity at construction time so a row that reaches the database without a trace is a programming error.
 
 ### Governance pipeline
 
@@ -116,7 +147,7 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-governance.svg" alt="Governance pipeline — terminal recording" width="820">
 </picture>
 
-> Every tool call hits `PreToolUse → govern`. Scope, secret scan, blocklist, rate limit — all synchronous, all in-process, all audited. → [`svg-cap-governance.sh`](demo/recording/svg/svg-cap-governance.sh) · [Learn more](https://systemprompt.io/features/governance-pipeline)
+> Scope, secret scan, blocklist, rate limit. All synchronous, all in-process, all audited. The backup line of defense behind tool mapping. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-governance-2b6cb0?style=flat-square)](https://systemprompt.io/features/governance-pipeline)
 
 ### Secrets management
 
@@ -126,7 +157,7 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-secrets.svg" alt="Secrets management — terminal recording" width="820">
 </picture>
 
-> Even admin-scope agents can't leak an AWS key, a GitHub PAT, or an RSA private key. Credentials are injected server-side at tool-call time. → [`svg-cap-secrets.sh`](demo/recording/svg/svg-cap-secrets.sh) · [Learn more](https://systemprompt.io/features/secrets-management)
+> Credentials encrypted at rest with ChaCha20-Poly1305 and injected server-side at tool-call time. They never enter the context window, never appear in logs, never transit the inference path. Even an admin-scope agent cannot exfiltrate an AWS key, a GitHub PAT, or a PEM private key. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-secrets-2b6cb0?style=flat-square)](https://systemprompt.io/features/secrets-management)
 
 ### MCP governance
 
@@ -136,7 +167,7 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-mcp.svg" alt="MCP governance — terminal recording" width="820">
 </picture>
 
-> Central registry, per-server OAuth2, scoped tool exposure, end-to-end access logs. → [`svg-cap-mcp.sh`](demo/recording/svg/svg-cap-mcp.sh) · [Learn more](https://systemprompt.io/features/mcp-governance)
+> Each MCP server operates as an independent OAuth2 resource server with isolated credentials and per-server scope validation. If a tool is not declared in the plugin manifest, it does not exist for that agent. Four-pass deploy-time validation catches port conflicts, missing configs, empty OAuth scopes, and malformed server types before anything starts. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-MCP-2b6cb0?style=flat-square)](https://systemprompt.io/features/mcp-governance)
 
 ### Analytics & observability
 
@@ -146,7 +177,7 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-analytics.svg" alt="Analytics and observability — terminal recording" width="820">
 </picture>
 
-> Audit trail, execution traces, cost attribution, dashboard overview — every decision queryable, every token costed. → [`svg-cap-analytics.sh`](demo/recording/svg/svg-cap-analytics.sh) · [Learn more](https://systemprompt.io/features/analytics-and-observability)
+> Nine CLI subcommands cover overview, conversations, agents, tools, requests, sessions, content, traffic, and costs. Anomaly detection flags values exceeding 2x (warning) or 3x (critical) of the rolling average. SIEM-ready JSON event streaming for Splunk, ELK, Datadog, Sumo Logic. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-analytics-2b6cb0?style=flat-square)](https://systemprompt.io/features/analytics-and-observability)
 
 ### Closed-loop agents
 
@@ -156,7 +187,7 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-agents.svg" alt="Closed-loop agents — terminal recording" width="820">
 </picture>
 
-> A2A discovery, AI reasoning with MCP tools, self-observation via analytics, full execution trace. → [`svg-cap-agents.sh`](demo/recording/svg/svg-cap-agents.sh) · [Learn more](https://systemprompt.io/features/closed-loop-agents)
+> Agents query their own error rate, cost, and latency through exposed MCP tools and adjust without a human in the loop. Every logged event carries eight correlation fields for complete request lineage reconstruction. A2A protocol enables multi-provider agent workflows with full governance on every hop. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-agents-2b6cb0?style=flat-square)](https://systemprompt.io/features/closed-loop-agents)
 
 ### Compliance
 
@@ -166,13 +197,17 @@ Four enforcement layers. Full audit trail. Zero blind spots.
   <img src="demo/recording/svg/output/dark/cap-compliance.svg" alt="Compliance — terminal recording" width="820">
 </picture>
 
-> Identity-bound audit table, structured log retention, config validation. Built for SOC 2, ISO 27001, HIPAA, and OWASP Agentic Top 10. → [`svg-cap-compliance.sh`](demo/recording/svg/svg-cap-compliance.sh) · [Learn more](https://systemprompt.io/features/compliance)
+> Identity-bound audit trails via JWT with 10 lifecycle event variants. Tiered log retention from debug (1 day) through error (90 days). Policy-as-code on PreToolUse hooks. All data on-premises, no outbound telemetry. Built for **SOC 2 Type II**, **ISO 27001**, **HIPAA**, and **OWASP Agentic Top 10**. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-compliance-2b6cb0?style=flat-square)](https://systemprompt.io/features/compliance)
 
 ---
 
 ## Integrations
 
-Provider-agnostic. Protocol-native. Fully extensible.
+**Provider-agnostic by trait, not by adapter.** The `AiProvider` trait abstracts 19 methods so switching between Anthropic, OpenAI, and Gemini changes config, not code. Cost attribution tracks spend across providers, models, and agents with microdollar precision. Same RBAC, same audit trail, same enforcement pipeline regardless of which model is behind the call.
+
+**Extensions compile into the binary.** The `Extension` trait exposes routes, schemas, migrations, jobs, LLM providers, tool providers, page prerenderers, roles, and config namespaces. Registration happens at link time via `register_extension!` with no runtime reflection and no dynamic loading. 12 extensions, 71 sqlx-checked schemas, and 13 background jobs ship by default.
+
+**Skills persist across sessions.** Claude Desktop and Cowork users install once via OAuth2 and get governed slash commands in every session. The same binary that governs AI agents also serves your website, blog, and documentation with Markdown content, PostgreSQL full-text search, and engagement analytics. systemprompt.io itself runs on this binary.
 
 ### Any AI agent
 
@@ -182,7 +217,27 @@ Provider-agnostic. Protocol-native. Fully extensible.
   <img src="demo/recording/svg/output/dark/int-any-agent.svg" alt="Any AI agent — terminal recording" width="820">
 </picture>
 
-> Anthropic, OpenAI, Gemini — any provider, any agent. One governance layer governs them all. → [`svg-int-any-agent.sh`](demo/recording/svg/svg-int-any-agent.sh) · [Learn more](https://systemprompt.io/features/any-ai-agent)
+> One governance layer for every provider. Swap Anthropic, OpenAI, or Gemini at the profile level. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-any%20agent-2b6cb0?style=flat-square)](https://systemprompt.io/features/any-ai-agent)
+
+### Claude Desktop & Cowork
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/int-cowork.svg">
+  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/int-cowork.svg">
+  <img src="demo/recording/svg/output/dark/int-cowork.svg" alt="Claude Desktop & Cowork — terminal recording" width="820">
+</picture>
+
+> Skills persist across sessions via OAuth2. Slash commands activate business skills governed by the same four-layer pipeline. Install once, sync forever. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-cowork-2b6cb0?style=flat-square)](https://systemprompt.io/features/cowork)
+
+### Web Server & Publisher
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/int-web-publisher.svg">
+  <source media="(prefers-color-scheme: light)" srcset="demo/recording/svg/output/light/int-web-publisher.svg">
+  <img src="demo/recording/svg/output/dark/int-web-publisher.svg" alt="Web Server & Publisher — terminal recording" width="820">
+</picture>
+
+> The same binary that governs AI agents serves your website, blog, and documentation. Markdown content, PostgreSQL full-text search, engagement analytics. No separate web tier, no CMS. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-web%20publisher-2b6cb0?style=flat-square)](https://systemprompt.io/features/web-publisher)
 
 ### Extensible architecture
 
@@ -192,9 +247,13 @@ Provider-agnostic. Protocol-native. Fully extensible.
   <img src="demo/recording/svg/output/dark/int-extensions.svg" alt="Extensions and capabilities — terminal recording" width="820">
 </picture>
 
-> 12 extensions, 71 sqlx-checked schemas, 13 jobs — all compiled into one binary, all discoverable via the CLI. → [`svg-int-extensions.sh`](demo/recording/svg/svg-int-extensions.sh) · [Learn more](https://systemprompt.io/features/extensible-architecture)
+> Your code compiles into your binary. Add routes, tables, jobs, and providers through Rust extension traits. No runtime reflection, no dynamic loading. &nbsp; [![Learn more](https://img.shields.io/badge/learn%20more-extensions-2b6cb0?style=flat-square)](https://systemprompt.io/features/extensible-architecture)
 
-### Governance at scale
+---
+
+## Performance
+
+Sub-5 ms governance overhead, benchmarked. Each request performs JWT validation, scope resolution, three rule evaluations, and an async database write. The enforcement pipeline is not a bottleneck.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="demo/recording/svg/output/dark/int-benchmark.svg">
@@ -202,23 +261,50 @@ Provider-agnostic. Protocol-native. Fully extensible.
   <img src="demo/recording/svg/output/dark/int-benchmark.svg" alt="Governance benchmark — terminal recording" width="820">
 </picture>
 
-> Measure it yourself with `just benchmark`. Author's laptop: **3,308 req/s** on the burst run, p50 13.5 ms / p99 22.7 ms. Governance adds <1% to AI response time. → [`svg-int-benchmark.sh`](demo/recording/svg/svg-int-benchmark.sh)
+| Metric | Result |
+|---|---|
+| **Throughput** | 3,308 req/s (burst), sustained under 100 concurrent workers |
+| **p50 latency** | 13.5 ms |
+| **p99 latency** | 22.7 ms |
+| **Overhead** | <1% added to AI response time |
+| **GC pauses** | Zero. Hundreds of concurrent developers on a single instance. |
+
+Reproduce with `just benchmark`. Numbers measured on the author's laptop.
 
 ---
 
-## License & production use
+## Configuration
 
-**This template** is MIT. Fork it, modify it, use it however you like — **for local evaluation**.
+All runtime configuration lives as flat YAML files under `services/`. The root `services/config/config.yaml` is a thin aggregator. Unknown YAML keys cause loud errors at load time (`#[serde(deny_unknown_fields)]`).
 
-**[systemprompt-core](https://github.com/systempromptio/systemprompt-core)** is [BSL-1.1](https://github.com/systempromptio/systemprompt-core/blob/main/LICENSE): free for evaluation, testing, and non-production use. **Production use requires a commercial license.** Each version converts to Apache 2.0 four years after publication.
+```
+services/
+  config/config.yaml        Root aggregator (includes all resource files)
+  agents/<id>.yaml          Agent definitions with scope, model, and tool access
+  mcp/<name>.yaml           MCP server definitions with OAuth2 config
+  skills/<id>.yaml          Skill definitions (config + markdown instruction body)
+  plugins/<name>.yaml       Plugin bindings referencing agents, skills, MCP servers
+  ai/config.yaml            AI provider config (Anthropic, OpenAI, Gemini)
+  scheduler/config.yaml     Background job schedule
+  web/config.yaml           Web frontend, navigation, theme
+  content/config.yaml       Content sources and indexing
+```
 
-**Evaluate Free** → you're already here. **Book a Meeting** → [**systemprompt.io**](https://systemprompt.io) · [ed@systemprompt.io](mailto:ed@systemprompt.io)
+Every resource is a flat file you can diff, review, and version. No database-stored config. No admin UI required for any configuration change.
+
+---
+
+## License
+
+**This template** is [MIT](LICENSE). Fork it, modify it, use it however you like.
+
+**[systemprompt-core](https://github.com/systempromptio/systemprompt-core)** is [BSL-1.1](https://github.com/systempromptio/systemprompt-core/blob/main/LICENSE): free for evaluation, testing, and non-production use. Production use requires a commercial license. Each version converts to Apache 2.0 four years after publication. Licensing enquiries: [ed@systemprompt.io](mailto:ed@systemprompt.io).
 
 ---
 
 <div align="center">
 
-**[systemprompt.io](https://systemprompt.io)** · **[systemprompt-core](https://github.com/systempromptio/systemprompt-core)** · **[Documentation](https://systemprompt.io/documentation/)** · **[Guides](https://systemprompt.io/guides)** · **[Discord](https://discord.gg/wkAbSuPWpr)**
+[![systemprompt.io](https://img.shields.io/badge/systemprompt.io-2b6cb0?style=for-the-badge)](https://systemprompt.io) &nbsp; [![Core](https://img.shields.io/badge/systemprompt--core-2b6cb0?style=for-the-badge)](https://github.com/systempromptio/systemprompt-core) &nbsp; [![Documentation](https://img.shields.io/badge/documentation-16a34a?style=for-the-badge)](https://systemprompt.io/documentation/) &nbsp; [![Guides](https://img.shields.io/badge/guides-f97316?style=for-the-badge)](https://systemprompt.io/guides) &nbsp; [![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wkAbSuPWpr)
 
 <sub>Own how your organization uses AI. Every interaction governed and provable.</sub>
 
