@@ -1,7 +1,7 @@
 mod demos;
 mod sections;
 
-pub use demos::{DemoCategory, DemoStep, DemosConfig, QuickStartStep};
+pub use demos::{DemoCategory, DemoPillar, DemoStep, DemosConfig, QuickStartStep};
 pub use sections::{
     ComparisonConfig, ComparisonItem, ComparisonSide, DifferentiatorConfig, DifferentiatorItem,
     ExtensionTrait, ExtensionsConfig, FaqConfig, FaqItem, FinalCtaConfig, PricingConfig,

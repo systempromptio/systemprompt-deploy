@@ -9,6 +9,15 @@ pub struct DemosConfig {
     #[serde(default)]
     pub quick_start: Vec<QuickStartStep>,
     #[serde(default)]
+    pub pillars: Vec<DemoPillar>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DemoPillar {
+    pub id: String,
+    pub title: String,
+    pub subtitle: String,
+    pub feature_url: String,
     pub categories: Vec<DemoCategory>,
 }
 
@@ -27,6 +36,7 @@ pub struct DemoCategory {
     pub tagline: String,
     pub story: String,
     pub cost: String,
+    pub feature_url: String,
     pub steps: Vec<DemoStep>,
 }
 

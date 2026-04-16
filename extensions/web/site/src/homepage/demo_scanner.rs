@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use super::config::{DemoCategory, DemoStep, DemosConfig, QuickStartStep};
+use super::config::{DemoCategory, DemoPillar, DemoStep, DemosConfig, QuickStartStep};
 
 const CLI_PREFIXES: &[&str] = &[
     "run_cli_indented ",
@@ -28,7 +28,16 @@ struct CategoryMeta {
     tagline: &'static str,
     story: &'static str,
     cost: &'static str,
+    feature_url: &'static str,
     steps: &'static [StepMeta],
+}
+
+struct PillarMeta {
+    id: &'static str,
+    title: &'static str,
+    subtitle: &'static str,
+    feature_url: &'static str,
+    category_ids: &'static [&'static str],
 }
 
 const CATEGORIES: &[CategoryMeta] = &[
@@ -38,6 +47,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Policy that runs on every tool call, not a slide in a security review.",
         story: "Staff engineers want to know what actually happens when an agent goes off-script. This walkthrough fires real PreToolUse hooks against the governance endpoint: a clean admin call passes all three rules, a user-scope agent gets denied at the scope and blocklist layers, and plaintext AWS keys, GitHub PATs, and PEM private keys are blocked before they reach a tool. Every decision lands in an audit table you can query, capped by rate limits you can inspect and hooks you can extend.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/governance-pipeline",
         steps: &[
             StepMeta {
                 script: "01-happy-path.sh",
@@ -95,6 +105,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "From \"which agents ship with the platform?\" to a fully traced AI call in five commands.",
         story: "Staff engineers evaluating an agent runtime want three things: to see what's configured, to watch one actually do work, and to trust that every call is auditable. This walkthrough starts at agent discovery, drills into the config and tool scopes that separate an admin agent from a user-scoped one, sends a live message that triggers real MCP tool use, and ends at the execution trace and A2A registry. By the last step you have seen events, artifacts, cost attribution, and service discovery for a single prompt.",
         cost: "API key required",
+        feature_url: "https://systemprompt.io/features/closed-loop-agents",
         steps: &[
             StepMeta {
                 script: "01-list-agents.sh",
@@ -134,6 +145,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Every MCP tool call is inventoried, governed, and costed — watch it catch a leaking secret.",
         story: "MCP is where agents meet real systems, which is exactly where enterprise reviews stall: who is connected, who called what, and what stops a misbehaving model from exfiltrating a secret. This walkthrough starts at the server inventory, then fires a governance hook with a clean payload and a payload containing an AWS key to show allow and deny decisions hitting the audit tables, and ends in the execution analytics view where every tool call is already counted.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/mcp-governance",
         steps: &[
             StepMeta {
                 script: "01-mcp-servers.sh",
@@ -161,6 +173,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Skills, the content that grounds them, and the contexts that ship them to live agents.",
         story: "\"Skill\" is a loaded word, so this walkthrough defines it by showing the whole supply chain. It starts with the skill lifecycle commands, moves to the content store that skills retrieve from, then to the managed file system that backs the content, then to the plugin package that bundles skills and hooks for distribution, and ends at contexts — the conversation containers every agent session binds to. By the end you can trace a skill from on-disk markdown to a live agent reply.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/cowork",
         steps: &[
             StepMeta {
                 script: "01-skill-lifecycle.sh",
@@ -200,6 +213,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "A guided tour of the platform's day-2 operational surface.",
         story: "Before you adopt anything, you want to know what it looks like at 2am. This walkthrough takes you through the operator CLI the same way an on-call engineer would: check service health, inspect the database, audit scheduled work, tail the logs, then review config. Every command is read-only, every answer is a single CLI call, and nothing here needs a dashboard.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/self-hosted-ai-platform",
         steps: &[
             StepMeta {
                 script: "01-services.sh",
@@ -239,6 +253,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Every agent call, every token, every dollar — queryable from the CLI.",
         story: "If you can't answer \"what did my agents do today and what did it cost?\" you can't run them in production. This walkthrough starts at the 24-hour overview and drills down: which agents are busy, what each model is costing, and the raw request stream with latency and token counts. The same telemetry powers the dashboard, so nothing here is a toy view.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/analytics-and-observability",
         steps: &[
             StepMeta {
                 script: "01-overview.sh",
@@ -296,6 +311,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Identity, roles, sessions, and abuse response from one CLI.",
         story: "Before trusting a platform with production agents, you want to know how user identity actually works. This walkthrough lists the user directory, drills into a single user's role, confirms the current authenticated session and profile, then demonstrates the IP-ban lever end to end — add, verify, remove — so you know the abuse-response path is real and reversible.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/compliance",
         steps: &[
             StepMeta {
                 script: "01-user-crud.sh",
@@ -329,6 +345,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "The same binary that runs governance also ships your marketing site.",
         story: "Most governance platforms stop at the API. Enterprise Demo also publishes systemprompt.io from the same Rust binary, using the same CLI, against the same database. This walkthrough inventories the content model, then runs the validator so you can see the publishing pipeline is real, typed, and CI-friendly.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/web-publisher",
         steps: &[
             StepMeta {
                 script: "01-web-config.sh",
@@ -350,6 +367,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Local dev and managed cloud are the same binary, one flag away.",
         story: "Every command you just ran against localhost takes a --profile flag. Point it at a managed tenant and the exact same CLI drives production. This walkthrough shows the read-only cloud surface — identity, deployment status, and profiles — so you can see how a laptop demo promotes to a real environment without a second toolchain.",
         cost: "",
+        feature_url: "https://systemprompt.io/features/deploy-anywhere",
         steps: &[
             StepMeta {
                 script: "01-cloud-overview.sh",
@@ -365,6 +383,7 @@ const CATEGORIES: &[CategoryMeta] = &[
         tagline: "Trace one request end-to-end, then prove it holds under 100 concurrent workers.",
         story: "Staff engineers don't trust benchmarks they can't reproduce. This walkthrough fires a real governance request, follows it through JWT validation, scope resolution, rule evaluation, and the async audit write — showing the typed Rust structs and sqlx-checked SQL at every stage. Then it runs 2,000 requests across three load profiles and prints real throughput, p50/p90/p99, and a capacity estimate in concurrent developers.",
         cost: "",
+        feature_url: "",
         steps: &[
             StepMeta {
                 script: "01-request-tracing.sh",
@@ -382,6 +401,30 @@ const CATEGORIES: &[CategoryMeta] = &[
     },
 ];
 
+const PILLARS: &[PillarMeta] = &[
+    PillarMeta {
+        id: "infrastructure",
+        title: "Infrastructure",
+        subtitle: "What It Is \u{00b7} How You Run It \u{00b7} Why You Can Trust It",
+        feature_url: "https://systemprompt.io/features/self-hosted-ai-platform",
+        category_ids: &["infrastructure", "cloud"],
+    },
+    PillarMeta {
+        id: "capabilities",
+        title: "Capabilities",
+        subtitle: "What It Does \u{00b7} How It Protects You \u{00b7} Why It Passes Audit",
+        feature_url: "https://systemprompt.io/features/governance-pipeline",
+        category_ids: &["governance", "agents", "mcp", "analytics", "users"],
+    },
+    PillarMeta {
+        id: "integrations",
+        title: "Integrations",
+        subtitle: "What It Connects To \u{00b7} How You Use It \u{00b7} Why It Scales",
+        feature_url: "https://systemprompt.io/features/any-ai-agent",
+        category_ids: &["skills", "web", "performance"],
+    },
+];
+
 pub fn scan_demos(demo_root: &Path) -> anyhow::Result<DemosConfig> {
     if !demo_root.is_dir() {
         anyhow::bail!("demo root not found: {}", demo_root.display());
@@ -389,7 +432,8 @@ pub fn scan_demos(demo_root: &Path) -> anyhow::Result<DemosConfig> {
 
     let quick_start = scan_quick_start(demo_root);
 
-    let mut categories = Vec::new();
+    // Build all categories first
+    let mut category_map: Vec<(String, DemoCategory)> = Vec::new();
     for meta in CATEGORIES {
         let dir = demo_root.join(meta.id);
         if !dir.is_dir() {
@@ -404,13 +448,42 @@ pub fn scan_demos(demo_root: &Path) -> anyhow::Result<DemosConfig> {
         if steps.is_empty() {
             continue;
         }
-        categories.push(DemoCategory {
-            id: meta.id.to_string(),
-            title: meta.title.to_string(),
-            tagline: meta.tagline.to_string(),
-            story: meta.story.to_string(),
-            cost: meta.cost.to_string(),
-            steps,
+        category_map.push((
+            meta.id.to_string(),
+            DemoCategory {
+                id: meta.id.to_string(),
+                title: meta.title.to_string(),
+                tagline: meta.tagline.to_string(),
+                story: meta.story.to_string(),
+                cost: meta.cost.to_string(),
+                feature_url: meta.feature_url.to_string(),
+                steps,
+            },
+        ));
+    }
+
+    // Group categories into pillars
+    let mut pillars = Vec::new();
+    for pillar in PILLARS {
+        let categories: Vec<DemoCategory> = pillar
+            .category_ids
+            .iter()
+            .filter_map(|id| {
+                category_map
+                    .iter()
+                    .find(|(cid, _)| cid == id)
+                    .map(|(_, cat)| cat.clone())
+            })
+            .collect();
+        if categories.is_empty() {
+            continue;
+        }
+        pillars.push(DemoPillar {
+            id: pillar.id.to_string(),
+            title: pillar.title.to_string(),
+            subtitle: pillar.subtitle.to_string(),
+            feature_url: pillar.feature_url.to_string(),
+            categories,
         });
     }
 
@@ -418,7 +491,7 @@ pub fn scan_demos(demo_root: &Path) -> anyhow::Result<DemosConfig> {
         title: Some(DEFAULT_TITLE.to_string()),
         subtitle: Some(DEFAULT_SUBTITLE.to_string()),
         quick_start,
-        categories,
+        pillars,
     })
 }
 

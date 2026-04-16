@@ -43,9 +43,9 @@ Organized by the three pillars of [systemprompt.io](https://systemprompt.io): **
 | Capabilities | [analytics/](analytics/) | 8 | Overview, agents, costs, requests, sessions, content/traffic | Free | `cap-analytics` |
 | Capabilities | [agents/](agents/) | 5 | Agent discovery, messaging, tracing, A2A registry | 2 @ ~$0.01 | `cap-agents` |
 | Capabilities | [users/](users/) | 4 | User CRUD, roles, sessions, IP bans | Free | `cap-compliance` |
-| Integrations | [skills/](skills/) | 5 | Skills, content, files, plugins, contexts | Free | `int-extensions` |
+| Integrations | [skills/](skills/) | 5 | Skills, content, files, plugins, contexts | Free | `int-cowork`, `int-extensions` |
+| Integrations | [web/](web/) | 2 | Content types, templates, sitemaps, validation | Free | `int-web-publisher` |
 | Integrations | [performance/](performance/) | 2 | Request tracing, benchmarks, load testing | Free | `int-benchmark` |
-| Integrations | [web/](web/) | 2 | Content types, templates, sitemaps, validation | Free | – |
 
 **Total: 43 category scripts + preflight + seed = 45 scripts. 41 free, 2 cost ~$0.01 each.**
 
