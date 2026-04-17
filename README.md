@@ -61,10 +61,10 @@ Open **http://localhost:8080** and run `systemprompt --help`. Point Claude Code,
 | **`just`** | Task runner for build, setup, and start commands | [just.systems](https://just.systems/) |
 | **`jq`** | JSON processing for config and session management | `brew install jq` / `apt install jq` |
 | **`yq`** | YAML processing for profile and secrets config | `brew install yq` / `pip install yq` |
-| **AI API key** | At least one of: Anthropic, OpenAI, or Gemini | Provider dashboard |
+| **AI API keys** | Keys for every provider enabled in `services/ai/config.yaml`. The shipped config enables all three (Anthropic, OpenAI, Gemini) with `default_provider: gemini`, so the marketplace MCP server will refuse to boot unless each enabled provider has a real key. Disable the ones you don't want in the AI config, or pass all three. | Provider dashboards |
 | **Ports `8080` + `5432`** | HTTP server + PostgreSQL | Free on localhost |
 
-Running a second clone side-by-side? `just setup-local <key> "" "" 8081 5433`.
+Running a second clone side-by-side? `just setup-local <anthropic> <openai> <gemini> 8081 5433`.
 
 ---
 
