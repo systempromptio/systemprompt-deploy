@@ -25,15 +25,15 @@ strip = true
 
 [workspace.package]
 edition = "2021"
-version = "0.2.1"
-authors = ["systemprompt.io <support@systemprompt.io>"]
+version = "0.2.2"
+authors = ["systemprompt.io <ed@systemprompt.io>"]
 license = "MIT"
 
 [workspace.dependencies]
 # ============================================
 # CORE FACADE (single dependency for all systemprompt-core)
 # ============================================
-systemprompt = { version = "0.2.1", default-features = false, features = ["core"] }
+systemprompt = { version = "0.2.2", default-features = false, features = ["core"] }
 
 # ============================================
 # LOCAL EXTENSIONS
