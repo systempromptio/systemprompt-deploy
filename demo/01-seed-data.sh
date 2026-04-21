@@ -31,8 +31,8 @@ header "SEED DATA" "Populating Enterprise Demo with baseline state"
 
 # ── STEP 1: Skills sync ────────────────────────
 subheader "STEP 1: Sync skills to database"
-cmd "systemprompt core skills sync"
-"$CLI" core skills sync --profile "$PROFILE" 2>&1 | tail -5 | sed 's/^/  /' || true
+cmd "systemprompt core skills sync --direction to-db --yes"
+"$CLI" core skills sync --direction to-db --yes --profile "$PROFILE" 2>&1 | tail -5 | sed 's/^/  /' || true
 echo ""
 
 # ── STEP 2: Contexts ───────────────────────────
