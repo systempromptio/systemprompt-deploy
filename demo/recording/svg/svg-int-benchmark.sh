@@ -7,17 +7,28 @@ source "$(dirname "$0")/_colors.sh"
 # Ensure hey is installed — pick the binary that matches this host.
 # A stale hey_linux_amd64 on a Mac is the usual reason benchmarks silently
 # "do nothing" (the call fails, stderr is swallowed, stats come back empty).
-HEY="/tmp/hey"
+# Use system hey if available, else /tmp/hey
+if command -v hey >/dev/null 2>&1; then
+  HEY="$(command -v hey)"
+else
+  HEY="/tmp/hey"
+fi
 if ! { [[ -x "$HEY" ]] && "$HEY" --help >/dev/null 2>&1; }; then
   rm -f "$HEY"
-  case "$(uname -s)/$(uname -m)" in
+  HEY="/tmp/hey"
+  OS_ARCH="$(uname -s)/$(uname -m)"
+  case "$OS_ARCH" in
     Darwin/*)                 HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_darwin_amd64" ;;
     Linux/x86_64|Linux/amd64) HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64" ;;
-    *) echo "ERROR: no prebuilt hey for $(uname -s)/$(uname -m) — 'brew install hey' or 'go install github.com/rakyll/hey@latest'" >&2; exit 1 ;;
+    *) echo "ERROR: no prebuilt hey for $OS_ARCH — 'brew install hey' or 'go install github.com/rakyll/hey@latest'" >&2; exit 1 ;;
   esac
-  curl -fsSL "$HEY_URL" -o "$HEY" && chmod +x "$HEY"
+  if ! curl -fsSL "$HEY_URL" -o "$HEY"; then
+    echo "ERROR: failed to download hey. Run: sudo apt-get install hey  (Linux) or brew install hey  (macOS)" >&2; exit 1
+  fi
+  chmod +x "$HEY"
   if ! "$HEY" --help >/dev/null 2>&1; then
-    echo "ERROR: hey won't run on $(uname -s)/$(uname -m). On Apple Silicon run 'softwareupdate --install-rosetta' or 'brew install hey'." >&2
+    echo "ERROR: hey won't run on $OS_ARCH." >&2
+    [[ "$OS_ARCH" == "Darwin/arm64" ]] && echo "       Apple Silicon: 'softwareupdate --install-rosetta' or 'brew install hey'." >&2
     rm -f "$HEY"; exit 1
   fi
 fi

@@ -570,19 +570,40 @@ record-svgs *NUMBERS:
 benchmark REQUESTS="200" CONCURRENCY="100":
     #!/usr/bin/env bash
     set -e
-    HEY="/tmp/hey"
+    # Use system hey if available, else /tmp/hey
+    if command -v hey >/dev/null 2>&1; then
+        HEY="$(command -v hey)"
+    else
+        HEY="/tmp/hey"
+    fi
     # Re-download if the cached binary can't execute here (e.g. Linux hey on a Mac).
     if ! { [[ -x "$HEY" ]] && "$HEY" --help >/dev/null 2>&1; }; then
         rm -f "$HEY"
-        case "$(uname -s)/$(uname -m)" in
-            Darwin/*)                 HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_darwin_amd64" ;;
-            Linux/x86_64|Linux/amd64) HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64" ;;
-            *) echo "ERROR: no prebuilt hey for $(uname -s)/$(uname -m). Install with 'brew install hey' or 'go install github.com/rakyll/hey@latest'." >&2; exit 1 ;;
+        HEY="/tmp/hey"
+        OS_ARCH="$(uname -s)/$(uname -m)"
+        case "$OS_ARCH" in
+            Darwin/*)
+                HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_darwin_amd64"
+                echo "Installing hey from $HEY_URL..."
+                curl -fsSL "$HEY_URL" -o "$HEY" && chmod +x "$HEY"
+                ;;
+            Linux/x86_64|Linux/amd64)
+                HEY_URL="https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64"
+                echo "Installing hey from $HEY_URL..."
+                if ! curl -fsSL "$HEY_URL" -o "$HEY"; then
+                    echo "ERROR: failed to download hey. Run: sudo apt-get install hey" >&2; exit 1
+                fi
+                chmod +x "$HEY"
+                ;;
+            *) echo "ERROR: no prebuilt hey for $OS_ARCH. Install with 'brew install hey' or 'go install github.com/rakyll/hey@latest'." >&2; exit 1 ;;
         esac
-        echo "Installing hey from $HEY_URL..."
-        curl -fsSL "$HEY_URL" -o "$HEY" && chmod +x "$HEY"
         if ! "$HEY" --help >/dev/null 2>&1; then
-            echo "ERROR: hey won't run on $(uname -s)/$(uname -m). Apple Silicon: 'softwareupdate --install-rosetta' or 'brew install hey'." >&2
+            echo "ERROR: hey won't run on $OS_ARCH." >&2
+            if [[ "$OS_ARCH" == "Darwin/arm64" ]]; then
+                echo "       Apple Silicon: 'softwareupdate --install-rosetta' or 'brew install hey'." >&2
+            else
+                echo "       Install manually: 'sudo apt-get install hey' or 'go install github.com/rakyll/hey@latest'." >&2
+            fi
             rm -f "$HEY"; exit 1
         fi
     fi

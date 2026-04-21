@@ -153,6 +153,11 @@ run_cli_indented() {
 # Supported:  Darwin/x86_64, Darwin/arm64 (via Rosetta 2), Linux/x86_64.
 # Unsupported: Linux/arm64 and everything else — prints a clear install hint.
 install_hey() {
+  # Prefer system-installed hey over /tmp/hey
+  if command -v hey >/dev/null 2>&1; then
+    HEY="$(command -v hey)"
+    return 0
+  fi
   HEY="${HEY:-/tmp/hey}"
   # Re-use a cached binary only if it actually executes on this host
   # (a stale hey_linux_amd64 left over on a Mac is the common failure mode).
@@ -164,29 +169,54 @@ install_hey() {
   os="$(uname -s)"
   arch="$(uname -m)"
   case "$os/$arch" in
-    Darwin/*)                  url="https://hey-release.s3.us-east-2.amazonaws.com/hey_darwin_amd64" ;;
-    Linux/x86_64|Linux/amd64)  url="https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64" ;;
+    Darwin/*)
+      url="https://hey-release.s3.us-east-2.amazonaws.com/hey_darwin_amd64"
+      echo "  Installing hey from $url ..."
+      if ! curl -fsSL "$url" -o "$HEY"; then
+        echo "ERROR: failed to download hey. Install with: brew install hey" >&2
+        return 1
+      fi
+      chmod +x "$HEY"
+      if ! "$HEY" --help >/dev/null 2>&1; then
+        echo "ERROR: downloaded hey cannot execute on $os/$arch." >&2
+        if [[ "$arch" == "arm64" ]]; then
+          echo "       Apple Silicon needs Rosetta 2: 'softwareupdate --install-rosetta'" >&2
+          echo "       or a native build: 'brew install hey'" >&2
+        fi
+        rm -f "$HEY"
+        return 1
+      fi
+      ;;
+    Linux/x86_64|Linux/amd64)
+      # Try package manager first (most reliable on Linux)
+      if command -v apt-get >/dev/null 2>&1; then
+        echo "  Installing hey via apt-get ..."
+        if sudo apt-get install -y hey >/dev/null 2>&1; then
+          HEY="$(command -v hey)"
+          return 0
+        fi
+      fi
+      # Fall back to S3 binary
+      url="https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64"
+      echo "  Installing hey from $url ..."
+      if ! curl -fsSL "$url" -o "$HEY"; then
+        echo "ERROR: failed to download hey. Install with: sudo apt-get install hey" >&2
+        echo "       or: go install github.com/rakyll/hey@latest" >&2
+        return 1
+      fi
+      chmod +x "$HEY"
+      if ! "$HEY" --help >/dev/null 2>&1; then
+        echo "ERROR: downloaded hey cannot execute on $os/$arch." >&2
+        rm -f "$HEY"
+        return 1
+      fi
+      ;;
     *)
       echo "ERROR: no prebuilt 'hey' binary for $os/$arch." >&2
       echo "       Install manually: 'brew install hey' or 'go install github.com/rakyll/hey@latest'" >&2
       return 1
       ;;
   esac
-  echo "  Installing hey from $url ..."
-  if ! curl -fsSL "$url" -o "$HEY"; then
-    echo "ERROR: failed to download hey from $url" >&2
-    return 1
-  fi
-  chmod +x "$HEY"
-  if ! "$HEY" --help >/dev/null 2>&1; then
-    echo "ERROR: downloaded hey cannot execute on $os/$arch." >&2
-    if [[ "$os/$arch" == "Darwin/arm64" ]]; then
-      echo "       Apple Silicon needs Rosetta 2: 'softwareupdate --install-rosetta'" >&2
-      echo "       or install a native build: 'brew install hey'" >&2
-    fi
-    rm -f "$HEY"
-    return 1
-  fi
 }
 
 # Runs a CLI command, indents, and limits output

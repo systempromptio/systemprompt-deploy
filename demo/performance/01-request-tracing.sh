@@ -383,12 +383,13 @@ echo "  5c. MCP tool call (list_plugins)"
 echo "      OAuth authentication → tool execution → structured response"
 echo ""
 
+ms_now() { python3 -c "import time; print(int(time.time()*1000))"; }
 MCP_TIMES=""
 for i in $(seq 1 5); do
-  START_NS=$(date +%s%N)
+  START_MS=$(ms_now)
   "$CLI" plugins mcp call skill-manager list_plugins '{}' --profile "$PROFILE" 2>/dev/null | head -1 > /dev/null
-  END_NS=$(date +%s%N)
-  MS=$(( (END_NS - START_NS) / 1000000 ))
+  END_MS=$(ms_now)
+  MS=$(( END_MS - START_MS ))
   MCP_TIMES="$MCP_TIMES $MS"
 done
 MCP_AVG=$(echo "$MCP_TIMES" | awk '{sum=0; for(i=1;i<=NF;i++) sum+=$i; printf "%.0f", sum/NF}')
