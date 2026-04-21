@@ -29,8 +29,6 @@ This repo is how you evaluate it. Clone it, run it on your own machine, bring yo
 > **Ready to evaluate?** Three commands from fresh clone to running platform. Every recording on this page is a real script you can run yourself.
 >
 > **Looking at the source?** This template is MIT. The engine is [systemprompt-core](https://github.com/systempromptio/systemprompt-core) (BSL-1.1), a 30-crate Rust workspace published on crates.io under `systemprompt-*`.
->
-> **Active:** 635 unique cloners in the first 14 days with zero paid acquisition — engineers who found it via crates.io and GitHub search.
 
 ```
   LLM Agent
