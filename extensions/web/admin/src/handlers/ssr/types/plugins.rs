@@ -44,7 +44,6 @@ pub struct PluginStats {
 pub struct MyPluginsPageData {
     pub page: &'static str,
     pub title: &'static str,
-    // JSON: template context for Handlebars rendering
     pub plugins: Vec<serde_json::Value>,
     pub has_plugins: bool,
     pub categories: Vec<String>,

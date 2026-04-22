@@ -178,6 +178,16 @@ fn user_page_routes() -> Router<Arc<PgPool>> {
             get(handlers::ssr::governance_hooks_page),
         )
         .route("/traces", get(handlers::ssr::traces_page))
+        .route("/devices", get(handlers::ssr::devices_page))
+        .route("/devices/pats", post(handlers::devices::issue_pat))
+        .route(
+            "/devices/pats/{id}",
+            axum::routing::delete(handlers::devices::revoke_pat),
+        )
+        .route(
+            "/devices/certs/{id}",
+            axum::routing::delete(handlers::devices::revoke_cert),
+        )
         .route("/access-control", get(handlers::ssr::access_control_page))
         .route("/analytics", get(handlers::ssr::analytics_overview_page))
         .route(

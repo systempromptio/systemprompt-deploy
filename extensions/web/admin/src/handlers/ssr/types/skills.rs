@@ -29,7 +29,6 @@ pub struct SkillStats {
 pub struct MySkillsPageData {
     pub page: &'static str,
     pub title: &'static str,
-    // JSON: template context for Handlebars rendering
     pub skills: Vec<serde_json::Value>,
     pub all_tags: Vec<String>,
     pub stats: SkillStats,
@@ -59,7 +58,6 @@ pub struct MySkillEditPageData {
     pub title: &'static str,
     pub is_edit: bool,
     pub is_forked: bool,
-    // JSON: template context for Handlebars rendering
     pub skill: serde_json::Value,
     pub required_secrets: Vec<RequiredSecretView>,
 }

@@ -32,8 +32,7 @@ pub async fn governance_rules_page(
             vec![]
         });
 
-    // Aggregate per policy (rule)
-    let mut agg: BTreeMap<String, (i64, i64, i64)> = BTreeMap::new(); // (total, allow, deny)
+    let mut agg: BTreeMap<String, (i64, i64, i64)> = BTreeMap::new();
     for r in &rows {
         let entry = agg.entry(r.policy.clone()).or_insert((0, 0, 0));
         entry.0 += 1;

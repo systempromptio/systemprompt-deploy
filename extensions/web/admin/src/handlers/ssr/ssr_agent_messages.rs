@@ -20,8 +20,6 @@ struct AgentMessageRow {
     created_at: DateTime<Utc>,
 }
 
-/// Agent messages detail page — message thread, AI reasoning, MCP tool calls,
-/// artifact creation. Mirrors `demo/agents/03-agent-messaging.sh`.
 pub async fn agent_messages_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

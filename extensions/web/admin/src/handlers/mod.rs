@@ -1,5 +1,7 @@
 pub mod access_control;
+pub mod cowork;
 pub mod demo_register;
+pub mod devices;
 pub mod export_zip;
 pub mod hooks_track;
 mod jobs;

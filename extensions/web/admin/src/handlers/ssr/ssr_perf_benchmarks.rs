@@ -29,10 +29,6 @@ struct HourThroughputRow {
     decisions: i64,
 }
 
-/// SSR page for `/admin/performance/benchmarks` — surfaces the most recent
-/// `demo/performance/02-load-test.sh` run by grouping governance decisions
-/// with session ids beginning with `bench-`, plus a 24-hour throughput
-/// histogram and an empty-state when no runs are recorded.
 pub async fn perf_benchmarks_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,
@@ -55,7 +51,6 @@ pub async fn perf_benchmarks_page(
         vec![]
     });
 
-    // JSON: template context for Handlebars rendering
     let runs_json: Vec<serde_json::Value> = runs
         .iter()
         .map(|r| {

@@ -1,3 +1,4 @@
+pub mod cowork_grp;
 pub mod dashboard_grp;
 pub mod effective_plugins;
 pub mod governance_grp;
@@ -8,8 +9,7 @@ pub mod publishing_grp;
 pub mod secrets_grp;
 pub mod users_grp;
 
-// Re-export all grouped modules at the top level so existing
-// `crate::repositories::<name>` paths continue to resolve unchanged.
+pub use cowork_grp::*;
 pub use dashboard_grp::*;
 pub use effective_plugins::{count_org_entity_additions, list_effective_enriched_plugins};
 pub use governance_grp::*;

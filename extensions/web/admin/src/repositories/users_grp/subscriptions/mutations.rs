@@ -13,7 +13,6 @@ pub struct UpsertSubscriptionParams<'a> {
     pub status: &'a str,
     pub period_start: Option<DateTime<Utc>>,
     pub period_end: Option<DateTime<Utc>>,
-    // JSON: Paddle payment provider data from jsonb column
     pub paddle_data: Option<serde_json::Value>,
 }
 
@@ -27,9 +26,7 @@ pub struct UpsertPlanParams<'a> {
     pub amount_cents: i32,
     pub currency: &'a str,
     pub billing_interval: &'a str,
-    // JSON: tier plan features from jsonb column
     pub features: &'a serde_json::Value,
-    // JSON: tier plan limits from jsonb column
     pub limits: &'a serde_json::Value,
     pub sort_order: i32,
 }

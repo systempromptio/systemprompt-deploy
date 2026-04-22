@@ -13,8 +13,6 @@ use sqlx::PgPool;
 
 use super::ACCESS_DENIED_HTML;
 
-/// SSR page for `/admin/mcp/access` — OAuth events, access grants and
-/// per-user governance decisions captured by the MCP access tracking demo.
 pub async fn mcp_access_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,
@@ -49,7 +47,6 @@ pub async fn mcp_access_page(
         }
     });
 
-    // JSON: template context for Handlebars rendering
     let access_events_json: Vec<serde_json::Value> = access_events
         .iter()
         .map(|e| {

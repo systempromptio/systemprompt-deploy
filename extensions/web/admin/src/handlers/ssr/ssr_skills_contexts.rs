@@ -9,12 +9,6 @@ use axum::{
 use serde_json::json;
 use sqlx::PgPool;
 
-/// Read-only dashboard surface for the `core contexts` CLI family.
-///
-/// Mirrors `demo/skills/05-contexts.sh`: list, create, show, edit, delete
-/// conversation contexts. Contexts are owned by the core CLI and not
-/// surfaced through an admin repository, so the page renders an
-/// instructional empty state pointing at the CLI.
 pub async fn skills_contexts_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

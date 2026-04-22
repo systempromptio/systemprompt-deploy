@@ -10,12 +10,6 @@ use axum::{
 use serde_json::json;
 use sqlx::PgPool;
 
-/// Read-only dashboard surface for the `core plugins` / `core hooks` /
-/// `plugins` CLI families.
-///
-/// Mirrors `demo/skills/04-plugin-management.sh`: plugin listing with
-/// validation, hook inventory, and extension capabilities. CRUD lives on
-/// `/admin/plugins`; this page is strictly read-only.
 pub async fn skills_plugins_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

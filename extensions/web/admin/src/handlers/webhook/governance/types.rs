@@ -59,7 +59,6 @@ pub(super) struct GovernanceContext<'a> {
     pub agent_scope: &'a str,
     pub session_id: &'a SessionId,
     pub user_id: &'a UserId,
-    // JSON: dynamic tool input from Claude Code event
     pub tool_input: Option<&'a serde_json::Value>,
 }
 
@@ -72,7 +71,7 @@ pub(super) struct AuditRecord {
     pub decision: String,
     pub policy: String,
     pub reason: String,
-    pub evaluated_rules: serde_json::Value, // JSON: protocol boundary
+    pub evaluated_rules: serde_json::Value,
     pub plugin_id: Option<String>,
 }
 

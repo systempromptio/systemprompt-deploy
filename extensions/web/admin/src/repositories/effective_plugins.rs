@@ -97,12 +97,6 @@ fn read_entity_name(entity_dir: &Path, fallback_id: &str) -> String {
     fallback_id.to_string()
 }
 
-/// Returns the union of a user's own plugins and org-authorized plugins.
-///
-/// Org plugins are synthesized from on-disk plugin metadata so they appear in
-/// the user's workspace views without requiring per-user rows. Plugins already
-/// present in `user_plugins` (by `plugin_id`) take precedence so user
-/// customizations are preserved.
 pub async fn list_effective_enriched_plugins(
     pool: &PgPool,
     user_id: &UserId,
@@ -150,7 +144,10 @@ pub async fn count_org_entity_additions(
 ) -> (i64, i64, i64, i64) {
     let org_groups = resolve_authorized_marketplace_groups(pool)
         .await
-        .unwrap_or_default();
+        .unwrap_or_else(|e| {
+            tracing::warn!(error = %e, "Failed to resolve org marketplace groups");
+            vec![]
+        });
 
     let mut seen: HashSet<String> = HashSet::new();
     let mut plugins = 0i64;

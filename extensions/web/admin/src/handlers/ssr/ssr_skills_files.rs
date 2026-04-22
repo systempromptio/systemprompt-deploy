@@ -9,12 +9,6 @@ use axum::{
 use serde_json::json;
 use sqlx::PgPool;
 
-/// Read-only dashboard surface for the `core files` CLI family.
-///
-/// Mirrors `demo/skills/03-file-management.sh`: file listing, upload
-/// configuration, and storage statistics. The underlying commands are
-/// CLI-only, so the page renders an instructional empty state pointing at
-/// the CLI.
 pub async fn skills_files_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

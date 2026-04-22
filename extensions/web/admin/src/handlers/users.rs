@@ -26,20 +26,7 @@ use super::responses::{EventsListResponse, UsersListResponse};
 pub fn extract_user_from_cookie(
     headers: &HeaderMap,
 ) -> Result<crate::types::CookieSession, String> {
-    let cookie_header = headers
-        .get("cookie")
-        .ok_or("No cookie header")?
-        .to_str()
-        .map_err(|e| format!("Invalid cookie header: {e}"))?;
-
-    let token = cookie_header
-        .split(';')
-        .find_map(|c| c.trim().strip_prefix("access_token="))
-        .ok_or("No access_token cookie")?;
-
-    if token.is_empty() {
-        return Err("Empty access_token cookie".to_string());
-    }
+    let token = extract_token_from_headers(headers)?;
 
     let jwt_secret =
         SecretsBootstrap::jwt_secret().map_err(|e| format!("Failed to load JWT secret: {e}"))?;
@@ -48,7 +35,7 @@ pub fn extract_user_from_cookie(
         .jwt_issuer
         .clone();
 
-    let claims = validate_jwt_token(token, jwt_secret, &jwt_issuer, &[JwtAudience::Api])
+    let claims = validate_jwt_token(&token, jwt_secret, &jwt_issuer, &[JwtAudience::Api])
         .map_err(|e| format!("JWT validation failed: {e}"))?;
 
     let email =
@@ -59,6 +46,36 @@ pub fn extract_user_from_cookie(
         username: claims.username,
         email,
     })
+}
+
+fn extract_token_from_headers(headers: &HeaderMap) -> Result<String, String> {
+    if let Some(auth) = headers.get("authorization").and_then(|v| v.to_str().ok()) {
+        if let Some(token) = auth
+            .strip_prefix("Bearer ")
+            .or_else(|| auth.strip_prefix("bearer "))
+        {
+            let t = token.trim();
+            if !t.is_empty() {
+                return Ok(t.to_string());
+            }
+        }
+    }
+
+    let cookie_header = headers
+        .get("cookie")
+        .ok_or("No cookie or Authorization header")?
+        .to_str()
+        .map_err(|e| format!("Invalid cookie header: {e}"))?;
+
+    let token = cookie_header
+        .split(';')
+        .find_map(|c| c.trim().strip_prefix("access_token="))
+        .ok_or("No access_token cookie or Authorization: Bearer")?;
+
+    if token.is_empty() {
+        return Err("Empty access_token cookie".to_string());
+    }
+    Ok(token.to_string())
 }
 
 pub async fn dashboard_handler(State(pool): State<Arc<PgPool>>) -> Response {

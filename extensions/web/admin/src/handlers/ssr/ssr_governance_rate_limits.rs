@@ -23,8 +23,6 @@ pub async fn governance_rate_limits_page(
         return (StatusCode::FORBIDDEN, Html(ACCESS_DENIED_HTML)).into_response();
     }
 
-    // Rate limit config is surfaced via the CLI (`admin config rate-limits show`).
-    // We render a read-only page pointing at the authoritative CLI source.
     let tiers = vec![
         json!({ "name": "free", "requests_per_minute": 10, "burst": 20 }),
         json!({ "name": "pro", "requests_per_minute": 60, "burst": 120 }),

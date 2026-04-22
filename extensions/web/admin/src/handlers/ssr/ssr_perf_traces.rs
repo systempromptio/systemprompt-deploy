@@ -22,9 +22,6 @@ struct TraceSessionRow {
     last_at: DateTime<Utc>,
 }
 
-/// SSR page for `/admin/performance/traces` — lists recent request traces
-/// (sessions) backing `demo/performance/01-request-tracing.sh`. Clicking
-/// through navigates to the existing `/admin/traces` session-detail view.
 pub async fn perf_traces_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,
@@ -40,7 +37,6 @@ pub async fn perf_traces_page(
         vec![]
     });
 
-    // JSON: template context for Handlebars rendering
     let traces_json: Vec<serde_json::Value> = traces
         .iter()
         .map(|t| {

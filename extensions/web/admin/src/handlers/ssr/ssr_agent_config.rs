@@ -7,12 +7,6 @@ use axum::{
 };
 use serde_json::json;
 
-/// Agent configuration detail page — validation, MCP tool access, availability.
-///
-/// Mirrors `demo/agents/02-agent-config.sh`:
-///   - `admin agents validate <id>` → config validity
-///   - `admin agents tools <id>`    → MCP servers assigned to the agent
-///   - `admin agents status`        → endpoint/port availability
 pub async fn agent_config_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

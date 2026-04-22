@@ -21,7 +21,7 @@ use axum::{
 };
 use sqlx::PgPool;
 
-pub use routes::{admin_ssr_router, workspace_ssr_router};
+pub use routes::{admin_ssr_router, cowork_auth_ssr_router, workspace_ssr_router};
 pub use types::{CreateUserRequest, MarketplaceContext, UsageEvent, UserContext, UserSummary};
 
 pub fn hooks_webhook_router(pool: Arc<PgPool>) -> Router {
@@ -57,6 +57,13 @@ pub fn secrets_router(pool: Arc<PgPool>) -> Router {
             "/admin/api/secrets/{plugin_id}/rotate",
             post(handlers::secrets::rotate_handler),
         )
+        .with_state(pool)
+}
+
+pub fn cowork_router(pool: Arc<PgPool>) -> Router {
+    Router::new()
+        .route("/v1/cowork/manifest", get(handlers::cowork::manifest::handle))
+        .route("/v1/cowork/whoami", get(handlers::cowork::whoami::handle))
         .with_state(pool)
 }
 

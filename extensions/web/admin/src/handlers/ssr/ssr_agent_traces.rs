@@ -20,8 +20,6 @@ struct AgentTraceRow {
     created_at: DateTime<Utc>,
 }
 
-/// Agent traces detail page — execution traces, artifact metadata, cost attribution.
-/// Mirrors `demo/agents/04-agent-tracing.sh`.
 pub async fn agent_traces_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

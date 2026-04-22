@@ -41,7 +41,6 @@ pub struct PreToolUseData {
     #[serde(default)]
     pub tool_name: String,
     #[serde(default)]
-    // JSON: dynamic tool input schema varies per tool
     pub tool_input: serde_json::Value,
     #[serde(default)]
     pub tool_use_id: String,
@@ -52,10 +51,8 @@ pub struct PostToolUseData {
     #[serde(default)]
     pub tool_name: String,
     #[serde(default)]
-    // JSON: dynamic tool input schema varies per tool
     pub tool_input: serde_json::Value,
     #[serde(default)]
-    // JSON: dynamic tool response varies per tool
     pub tool_response: serde_json::Value,
     #[serde(default)]
     pub tool_use_id: String,
@@ -66,7 +63,6 @@ pub struct PostToolUseFailureData {
     #[serde(default)]
     pub tool_name: String,
     #[serde(default)]
-    // JSON: dynamic tool input schema varies per tool
     pub tool_input: serde_json::Value,
     #[serde(default)]
     pub tool_use_id: String,
@@ -80,9 +76,7 @@ pub struct PermissionRequestData {
     #[serde(default)]
     pub tool_name: String,
     #[serde(default)]
-    // JSON: dynamic tool input schema varies per tool
     pub tool_input: serde_json::Value,
-    // JSON: dynamic permission suggestion structure
     pub permission_suggestions: Option<serde_json::Value>,
 }
 
@@ -168,7 +162,6 @@ pub struct InstructionsLoadedData {
     pub memory_type: String,
     #[serde(default)]
     pub load_reason: String,
-    // JSON: dynamic glob pattern configuration
     pub globs: Option<serde_json::Value>,
     pub trigger_file_path: Option<String>,
     pub parent_file_path: Option<String>,

@@ -204,7 +204,13 @@ pub async fn require_user_middleware(request: Request, next: Next) -> Response {
     match user_ctx {
         Some(ctx) if !ctx.user_id.as_str().is_empty() => next.run(request).await,
         _ => {
-            let uri = request.uri().path().to_string();
+            let uri = request
+                .extensions()
+                .get::<axum::extract::OriginalUri>()
+                .map_or_else(
+                    || request.uri().path().to_string(),
+                    |o| o.0.path().to_string(),
+                );
             let redirect_url = format!("/admin/login?redirect={uri}");
             axum::response::Redirect::temporary(&redirect_url).into_response()
         }

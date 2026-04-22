@@ -9,12 +9,6 @@ use axum::{
 use serde_json::json;
 use sqlx::PgPool;
 
-/// Read-only dashboard surface for the `core content` CLI family.
-///
-/// Mirrors `demo/skills/02-content-management.sh`: content listing, search,
-/// popularity, and health. The underlying commands are CLI-only (no admin
-/// repository) so the page renders an instructional empty state that points
-/// operators at the CLI.
 pub async fn skills_content_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,

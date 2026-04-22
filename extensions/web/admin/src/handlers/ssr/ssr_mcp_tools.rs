@@ -29,8 +29,6 @@ struct ToolByAgent {
     usage_count: i64,
 }
 
-/// SSR page for `/admin/mcp/tools` — tool availability per agent, execution
-/// logs and tool-usage analytics backing `demo/mcp/03-mcp-tool-execution.sh`.
 pub async fn mcp_tools_page(
     Extension(user_ctx): Extension<UserContext>,
     Extension(mkt_ctx): Extension<MarketplaceContext>,
@@ -65,7 +63,6 @@ pub async fn mcp_tools_page(
         vec![]
     });
 
-    // JSON: template context for Handlebars rendering
     let success_json: Vec<serde_json::Value> = success_rates
         .iter()
         .map(|r| {

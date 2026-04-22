@@ -134,7 +134,8 @@ impl Extension for WebExtension {
             tier_cache.clone(),
         );
         let webhook_api = admin::hooks_webhook_router(Arc::clone(&write_pool));
-        let secrets_api = admin::secrets_router(write_pool);
+        let secrets_api = admin::secrets_router(Arc::clone(&write_pool));
+        let cowork_api = admin::cowork_router(Arc::clone(&pool));
         let marketplace_git = admin::marketplace_git_router(Arc::clone(&pool));
         let links_router = api::router(Arc::clone(&pool), self.validated_config.clone());
 
@@ -178,11 +179,14 @@ impl Extension for WebExtension {
             ai_service,
             tier_cache,
         );
+        let cowork_auth_router = admin::cowork_auth_ssr_router(Arc::clone(&pool), engine.clone());
         let ssr_router = admin::admin_ssr_router(pool, engine);
 
         let combined = Router::new()
             .nest_service("/control-center", workspace_router)
             .nest_service("/admin", ssr_router)
+            .nest_service("/cowork-auth", cowork_auth_router)
+            .merge(cowork_api)
             .nest("/api/public", api_router);
 
         Some(ExtensionRouter::public(combined, "/"))
@@ -191,7 +195,7 @@ impl Extension for WebExtension {
     fn site_auth(&self) -> Option<SiteAuthConfig> {
         Some(SiteAuthConfig {
             login_path: "/admin/login",
-            protected_prefixes: &["/admin", "/control-center"],
+            protected_prefixes: &["/admin", "/control-center", "/cowork-auth"],
             public_prefixes: &["/admin/login", "/admin/add-passkey"],
             required_scope: "user",
         })

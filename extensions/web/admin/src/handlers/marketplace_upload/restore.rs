@@ -83,7 +83,6 @@ async fn load_target_version(
     }
 }
 
-// JSON: dynamic snapshot of current skill collection
 async fn snapshot_current(pool: &PgPool, user_id: &UserId) -> Result<serde_json::Value, Response> {
     repositories::marketplace_sync::snapshot_current_skills(pool, user_id)
         .await
