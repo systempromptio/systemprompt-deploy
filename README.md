@@ -45,7 +45,10 @@ just start                                               # 3. serve governance, 
 
 ---
 
-## Install the Cowork credential helper
+<details>
+<summary><strong>Install the Cowork credential helper</strong> — only if you're pointing Claude for Work at this binary</summary>
+
+<br>
 
 The `systemprompt-cowork` binary is the **Credential helper script** slot in Claude for Work. It turns a PAT into a short-lived JWT that Claude Desktop merges into every inference request routed at this binary. Download the prebuilt Windows or Linux binary from [systempromptio/systemprompt-core releases](https://github.com/systempromptio/systemprompt-core/releases/tag/cowork-v0.2.0); macOS builds from source on any Mac.
 
@@ -133,6 +136,8 @@ systemprompt-cowork uninstall   # remove
 ```
 
 Mount targets: `/Library/Application Support/Claude/org-plugins/` (macOS), `C:\ProgramData\Claude\org-plugins\` (Windows), `${XDG_DATA_HOME:-$HOME/.local/share}/Claude/org-plugins/` (Linux).
+
+</details>
 
 ---
 
