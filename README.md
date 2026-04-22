@@ -8,11 +8,9 @@
 
 # Run Claude for Work on your own infrastructure, with your own choice of inference.
 
-### Install this binary, point your Claude-for-Work fleet at it, and every Claude Desktop request flows through a `/v1/messages` gateway **you operate** — on your network, in your air-gap, under your audit table. Pick the upstream per model pattern: Anthropic, OpenAI, Gemini, Moonshot (Kimi), Qwen, MiniMax, or a custom provider you register yourself. One YAML block swaps it.
+Install this binary, point your Claude-for-Work fleet at it, and every Claude Desktop request lands on a host **you operate** — on your network, in your air-gap, under your audit table. Pick the upstream per model pattern: Anthropic, OpenAI, Gemini, Moonshot (Kimi), Qwen, MiniMax, or a custom provider you register yourself. One YAML block swaps it.
 
-### Every tool call authenticated, scoped, secret-scanned, rate-limited, and audited before the tool process spawns. No data leaves your network.
-
-### ~50 MB Rust binary. One PostgreSQL. Four commands from `git clone` to serving inference. Built for SOC 2, ISO 27001, HIPAA, and the OWASP Agentic Top 10.
+Every tool call authenticated, scoped, secret-scanned, rate-limited, and audited before the tool process spawns. ~50 MB Rust binary, one PostgreSQL, four commands from `git clone` to serving inference. Built for SOC 2, ISO 27001, HIPAA, and the OWASP Agentic Top 10.
 
 [![Built on systemprompt-core](https://img.shields.io/badge/built%20on-systemprompt--core-2b6cb0?style=flat-square)](https://github.com/systempromptio/systemprompt-core)
 [![Template · MIT](https://img.shields.io/badge/template-MIT-16a34a?style=flat-square)](LICENSE)
@@ -47,20 +45,94 @@ just start                                               # 3. serve governance, 
 
 ---
 
-## Contents
+## Install the Cowork credential helper
 
-- [What a CISO gets](#what-a-ciso-gets)
-- [What you'll see in the first five minutes](#what-youll-see-in-the-first-five-minutes)
-- [The scripted demos](#the-scripted-demos)
-- [Prerequisites](#prerequisites)
-- [Claude for Work / LLM Gateway — new in v0.3.0](#claude-for-work--llm-gateway--new-in-v030)
-- [Install the Cowork credential helper](#install-the-cowork-credential-helper)
-- [The governance pipeline](#the-governance-pipeline)
-- [How credential injection works](#how-credential-injection-works)
-- [Performance](#performance)
-- [Configuration & CLI](#configuration--cli)
-- [More recordings](#more-recordings--infrastructure-integrations-analytics-agents-compliance-mcp-governance)
-- [License](#license)
+The `systemprompt-cowork` binary is the **Credential helper script** slot in Claude for Work. It turns a PAT into a short-lived JWT that Claude Desktop merges into every inference request routed at this binary. Download the prebuilt Windows or Linux binary from [systempromptio/systemprompt-core releases](https://github.com/systempromptio/systemprompt-core/releases/tag/cowork-v0.2.0); macOS builds from source on any Mac.
+
+Current release: **[cowork-v0.2.0](https://github.com/systempromptio/systemprompt-core/releases/tag/cowork-v0.2.0)** — Linux x86_64 + Windows x86_64 (mingw ABI). macOS build is pending a Mac-hosted CI.
+
+### 1. Download
+
+**Linux x86_64**
+
+```bash
+curl -fsSL -o /usr/local/bin/systemprompt-cowork \
+  https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-unknown-linux-gnu
+chmod +x /usr/local/bin/systemprompt-cowork
+curl -fsSL https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-unknown-linux-gnu.sha256 \
+  | sha256sum -c --ignore-missing
+```
+
+**Windows x86_64** (PowerShell as Administrator):
+
+```powershell
+$dir = "C:\Program Files\systemprompt"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+Invoke-WebRequest `
+  -Uri "https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-pc-windows-gnu.exe" `
+  -OutFile "$dir\systemprompt-cowork.exe"
+[Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$dir", "User")
+```
+
+Windows Smart Screen will flag the unsigned binary on first run → "More info" → "Run anyway".
+
+**macOS** (source build):
+
+```bash
+git clone https://github.com/systempromptio/systemprompt-core.git
+cd systemprompt-core
+cargo build --manifest-path bin/cowork/Cargo.toml --release \
+  --target "$(rustc -vV | awk '/host:/ {print $2}')"
+sudo install -m 755 \
+  "bin/cowork/target/$(rustc -vV | awk '/host:/ {print $2}')/release/systemprompt-cowork" \
+  /usr/local/bin/
+```
+
+### 2. Configure
+
+Linux/macOS: `~/.config/systemprompt/systemprompt-cowork.toml`
+Windows: `%APPDATA%\systemprompt\systemprompt-cowork.toml`
+
+```toml
+[gateway]
+url = "http://localhost:8080"   # for the local-trial template; swap to your production host
+
+[pat]
+token = "sp-live-your-personal-access-token"
+```
+
+Issue a PAT from the running binary with `systemprompt admin users pat issue <user-id> --name cowork-laptop`. Absent config sections are silently skipped. Dev overrides: `SP_COWORK_GATEWAY_URL`, `SP_COWORK_PAT`.
+
+### 3. Verify
+
+```bash
+systemprompt-cowork           # prints exactly one JSON {token, ttl, headers}
+systemprompt-cowork --check   # exits 0 if a token can be issued
+```
+
+Diagnostics go to stderr only. The stdout JSON matches Anthropic's `inferenceCredentialHelper` contract byte-for-byte.
+
+### 4. Point Claude Desktop at it
+
+In Claude Desktop **Enterprise → Settings → Inference**:
+
+- **Credential helper script**: `/usr/local/bin/systemprompt-cowork` (or `C:\Program Files\systemprompt\systemprompt-cowork.exe`).
+- **API base URL**: the `gateway.url` from your TOML.
+
+Every Claude Desktop request now lands a row in `ai_requests` with `user_id`, `tenant_id`, `session_id`, `trace_id`, tokens, cost, and latency — identical governance to every other tool call. Run `systemprompt infra logs audit <request-id> --full` after a prompt to see the trace end-to-end.
+
+### 5. (Optional) Install the `org-plugins/` sync agent
+
+The same binary manages Cowork's signed plugin / managed-MCP mount:
+
+```bash
+systemprompt-cowork install     # register launchd (macOS) / scheduled task (Windows) / systemd --user (Linux)
+systemprompt-cowork sync        # pull signed plugin manifest + allowlist now
+systemprompt-cowork validate    # verify the ed25519 signature
+systemprompt-cowork uninstall   # remove
+```
+
+Mount targets: `/Library/Application Support/Claude/org-plugins/` (macOS), `C:\ProgramData\Claude\org-plugins\` (Windows), `${XDG_DATA_HOME:-$HOME/.local/share}/Claude/org-plugins/` (Linux).
 
 ---
 
@@ -183,7 +255,7 @@ Routes evaluate in order; first `model_pattern` match wins. `upstream_model` let
 - `POST /mtls` — `501` (device-cert exchange not yet wired).
 - `GET /capabilities` — `{"modes":["pat"]}`; probes advertise which exchange modes this deployment accepts.
 
-The helper writes the signed JWT + expiry to the OS cache dir with mode `0600`. Stdout contract is exactly one JSON object; all diagnostics go to stderr. Released out-of-band as `cowork-v*` tags. See **[Install the Cowork credential helper](#install-the-cowork-credential-helper)** below for download + configure + wire-up steps.
+The helper writes the signed JWT + expiry to the OS cache dir with mode `0600`. Stdout contract is exactly one JSON object; all diagnostics go to stderr. Released out-of-band as `cowork-v*` tags. See **[Install the Cowork credential helper](#install-the-cowork-credential-helper)** above for download + configure + wire-up steps.
 
 **Extensible provider registry.** `GatewayRoute.provider` is a free-form string resolved at dispatch time against a startup-built registry. Extension crates register new upstreams with:
 
@@ -197,100 +269,6 @@ inventory::submit! {
 ```
 
 The `GatewayUpstream` trait (`async fn proxy(&self, ctx: UpstreamCtx<'_>)`) is the single integration seam. Built-in tags seeded automatically; extension tags may shadow built-ins (logged as a warning). Full detail: [`core/CHANGELOG.md`](https://github.com/systempromptio/systemprompt-core/blob/main/CHANGELOG.md#030---2026-04-22).
-
-</details>
-
-<details>
-<summary><strong>Install the Cowork credential helper</strong></summary>
-
-<br>
-
-The `systemprompt-cowork` binary is the "Credential helper script" slot in Claude for Work. It turns a PAT into a short-lived JWT + canonical identity headers, printed as a single JSON object that Claude Desktop merges into every `/v1/messages` call against the gateway.
-
-Current release: **[cowork-v0.2.0](https://github.com/systempromptio/systemprompt-core/releases/tag/cowork-v0.2.0)**. Linux x86_64 + Windows x86_64 (mingw ABI) binaries attached. macOS pending a Mac-hosted build — source build works on any Mac.
-
-### 1. Download
-
-**Linux x86_64**
-
-```bash
-curl -fsSL -o /usr/local/bin/systemprompt-cowork \
-  https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-unknown-linux-gnu
-chmod +x /usr/local/bin/systemprompt-cowork
-curl -fsSL https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-unknown-linux-gnu.sha256 \
-  | sha256sum -c --ignore-missing
-```
-
-**Windows x86_64** (PowerShell as Administrator):
-
-```powershell
-$dir = "C:\Program Files\systemprompt"
-New-Item -ItemType Directory -Force -Path $dir | Out-Null
-Invoke-WebRequest `
-  -Uri "https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.2.0/systemprompt-cowork-x86_64-pc-windows-gnu.exe" `
-  -OutFile "$dir\systemprompt-cowork.exe"
-[Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$dir", "User")
-```
-
-Windows Smart Screen will flag the unsigned binary on first run → "More info" → "Run anyway".
-
-**macOS** (source build):
-
-```bash
-git clone https://github.com/systempromptio/systemprompt-core.git
-cd systemprompt-core
-cargo build --manifest-path bin/cowork/Cargo.toml --release \
-  --target "$(rustc -vV | awk '/host:/ {print $2}')"
-sudo install -m 755 \
-  "bin/cowork/target/$(rustc -vV | awk '/host:/ {print $2}')/release/systemprompt-cowork" \
-  /usr/local/bin/
-```
-
-### 2. Configure
-
-Linux/macOS: `~/.config/systemprompt/systemprompt-cowork.toml`
-Windows: `%APPDATA%\systemprompt\systemprompt-cowork.toml`
-
-```toml
-[gateway]
-url = "http://localhost:8080"   # for the local-trial template; swap to your production host
-
-[pat]
-token = "sp-live-your-personal-access-token"
-```
-
-Issue a PAT from the running binary with `systemprompt admin users pat issue <user-id> --name cowork-laptop`. Absent config sections are silently skipped — sessions and mTLS will return `NotConfigured` and the chain falls through to PAT. Dev overrides: `SP_COWORK_GATEWAY_URL`, `SP_COWORK_PAT`.
-
-### 3. Verify
-
-```bash
-systemprompt-cowork           # prints exactly one JSON {token, ttl, headers}
-systemprompt-cowork --check   # exits 0 if a token can be issued
-```
-
-Diagnostics go to stderr only. The stdout JSON matches Anthropic's `inferenceCredentialHelper` contract byte-for-byte.
-
-### 4. Point Claude Desktop at it
-
-In Claude Desktop **Enterprise → Settings → Inference**:
-
-- **Credential helper script**: `/usr/local/bin/systemprompt-cowork` (or `C:\Program Files\systemprompt\systemprompt-cowork.exe`).
-- **API base URL**: the `gateway.url` from your TOML.
-
-Every Claude Desktop request now flows through `/v1/messages` and lands a row in `ai_requests` with `user_id`, `tenant_id`, `session_id`, `trace_id`, tokens, cost, and latency — identical governance to every other tool call. Run `systemprompt infra logs audit <request-id> --full` after a prompt to see the trace end-to-end.
-
-### 5. (Optional) Install the `org-plugins/` sync agent
-
-The same binary manages Cowork's signed plugin / managed-MCP mount:
-
-```bash
-systemprompt-cowork install     # register launchd (macOS) / scheduled task (Windows) / systemd --user (Linux)
-systemprompt-cowork sync        # pull signed plugin manifest + allowlist now
-systemprompt-cowork validate    # verify the ed25519 signature
-systemprompt-cowork uninstall   # remove
-```
-
-Mount targets: `/Library/Application Support/Claude/org-plugins/` (macOS), `C:\ProgramData\Claude\org-plugins\` (Windows), `${XDG_DATA_HOME:-$HOME/.local/share}/Claude/org-plugins/` (Linux).
 
 </details>
 
