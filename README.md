@@ -6,9 +6,9 @@
   <img src="https://systemprompt.io/files/images/logo-dark.svg" alt="systemprompt.io" width="380">
 </picture>
 
-# Run Claude for Work on your own infrastructure, with your own choice of inference.
+# Run your AI agent fleet on your own infrastructure, with your own choice of inference.
 
-Install this binary, point your Claude-for-Work fleet at it, and every Claude Desktop request lands on a host **you operate** — on your network, in your air-gap, under your audit table. Pick the upstream per model pattern: Anthropic, OpenAI, Gemini, Moonshot (Kimi), Qwen, MiniMax, or a custom provider you register yourself. One YAML block swaps it.
+Install this binary, point Claude for Work, Claude Code, any Anthropic-SDK client, or any MCP host at it, and every request lands on a host **you operate** — on your network, in your air-gap, under your audit table. Pick the upstream per model pattern: Anthropic, OpenAI, Gemini, Moonshot (Kimi), Qwen, MiniMax, or a custom provider you register yourself. One YAML block swaps it.
 
 Every tool call authenticated, scoped, secret-scanned, rate-limited, and audited before the tool process spawns. ~50 MB Rust binary, one PostgreSQL, four commands from `git clone` to serving inference. Built for SOC 2, ISO 27001, HIPAA, and the OWASP Agentic Top 10.
 
