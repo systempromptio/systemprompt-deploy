@@ -391,6 +391,24 @@ setup-local ANTHROPIC_KEY="" OPENAI_KEY="" GEMINI_KEY="" HTTP_PORT="8080" PG_POR
       source: file
     extensions:
       disabled: []
+    gateway:
+      enabled: true
+      routes:
+        # Claude Cowork / any Anthropic-SDK client hitting /v1/messages.
+        # model_pattern matches the exact id Cowork sends (e.g. claude-sonnet-4-6,
+        # claude-opus-4-7); raw body passes through — no upstream_model remap.
+        - model_pattern: "claude-*"
+          provider: anthropic
+          endpoint: https://api.anthropic.com/v1
+          api_key_secret: anthropic
+        - model_pattern: "gpt-*"
+          provider: openai
+          endpoint: https://api.openai.com/v1
+          api_key_secret: openai
+        - model_pattern: "gemini-*"
+          provider: gemini
+          endpoint: https://generativelanguage.googleapis.com/v1beta
+          api_key_secret: gemini
     YAML
     fi
     if [ ! -f "$PROFILE_DIR/secrets.json" ]; then
