@@ -147,6 +147,42 @@ impl PublishPipelineJob {
         }
     }
 
+    async fn run_plugin_autofork(&self, db_pool: &DbPool, stats: &mut PipelineStats) {
+        let services_path = match AppPaths::get() {
+            Ok(paths) => paths.system().services().to_path_buf(),
+            Err(e) => {
+                tracing::warn!(error = %e, "plugin autofork skipped: AppPaths unavailable");
+                stats.record_failure();
+                return;
+            }
+        };
+        let pool = match db_pool.pool() {
+            Some(p) => p,
+            None => {
+                tracing::warn!("plugin autofork skipped: db pool unavailable");
+                stats.record_failure();
+                return;
+            }
+        };
+        let report = systemprompt_web_admin::autofork::autofork_declared_plugins_for_admins(
+            &pool,
+            &services_path,
+        )
+        .await;
+        tracing::info!(
+            users = report.users_considered,
+            forked = report.plugins_forked,
+            skipped = report.plugins_skipped_already_bound,
+            failed = report.plugins_failed,
+            "plugin autofork completed"
+        );
+        if report.plugins_failed > 0 {
+            stats.record_failure();
+        } else {
+            stats.record_success();
+        }
+    }
+
     async fn run_asset_organization(&self, stats: &mut PipelineStats) {
         if let Ok(paths) = AppPaths::get() {
             let dist_dir = paths.web().dist().to_path_buf();
@@ -201,6 +237,7 @@ impl Job for PublishPipelineJob {
         self.run_llms_txt(ctx, &mut stats).await;
         self.run_robots_txt(ctx, &mut stats).await;
         self.run_feed(db_pool, &mut stats).await;
+        self.run_plugin_autofork(db_pool, &mut stats).await;
         self.run_asset_organization(&mut stats).await;
 
         let duration_ms = u64::try_from(start_time.elapsed().as_millis()).unwrap_or(u64::MAX);

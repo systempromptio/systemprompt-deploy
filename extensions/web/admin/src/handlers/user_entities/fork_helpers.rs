@@ -31,9 +31,16 @@ pub async fn fork_single_plugin(
         base_plugin_id: Some(org_plugin.id.clone()),
     };
 
-    let plugin = repositories::create_user_plugin(pool, user_id, &create_plugin_req)
-        .await
-        .map_err(|e| format!("Failed to create forked plugin: {e}"))?;
+    // Idempotent: if the user already has this plugin bound (unique key on
+    // user_id+plugin_id), reuse the existing row instead of raising 500 on the
+    // duplicate-key violation. Child fork helpers below are already get-or-create.
+    let plugin = match repositories::find_user_plugin(pool, user_id, &plugin_id).await {
+        Ok(Some(existing)) => existing,
+        Ok(None) => repositories::create_user_plugin(pool, user_id, &create_plugin_req)
+            .await
+            .map_err(|e| format!("Failed to create forked plugin: {e}"))?,
+        Err(e) => return Err(format!("Failed to look up existing forked plugin: {e}")),
+    };
 
     let forked_skill_ids = fork_plugin_skills(pool, user_id, org_plugin, services_path).await;
     let forked_agent_ids = fork_plugin_agents(pool, user_id, org_plugin, services_path).await;

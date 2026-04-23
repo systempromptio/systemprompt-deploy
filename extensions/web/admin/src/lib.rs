@@ -1,4 +1,5 @@
 pub mod activity;
+pub mod autofork;
 pub mod event_hub;
 pub mod gamification;
 pub(crate) mod handlers;
