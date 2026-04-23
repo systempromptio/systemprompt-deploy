@@ -73,7 +73,7 @@ If step 4 fails, stop — the server build is broken and no Windows flow will wo
 
 ## 4. Install the helper on the Windows machine
 
-Download the Windows asset from https://github.com/systempromptio/systemprompt-core/releases/tag/v0.3.2. Confirm the exact filename on the release page (looks like `systemprompt-cowork-x86_64-pc-windows-gnu.exe`).
+Latest Windows build is in **[cowork-v0.3.0](https://github.com/systempromptio/systemprompt-core/releases/tag/cowork-v0.3.0)** — asset `systemprompt-cowork-x86_64-pc-windows-gnu.exe`. Renaming to `sp-cowork-auth.exe` on install keeps it consistent with the CLI name used in these docs.
 
 PowerShell (Admin):
 
@@ -81,10 +81,8 @@ PowerShell (Admin):
 $dir = "C:\Program Files\systemprompt"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
-# Replace <asset> with the exact .exe filename from the release page.
-# Rename to sp-cowork-auth.exe so it matches the documented CLI name.
 Invoke-WebRequest `
-  -Uri "https://github.com/systempromptio/systemprompt-core/releases/download/v0.3.2/<asset>" `
+  -Uri "https://github.com/systempromptio/systemprompt-core/releases/download/cowork-v0.3.0/systemprompt-cowork-x86_64-pc-windows-gnu.exe" `
   -OutFile "$dir\sp-cowork-auth.exe"
 
 [Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$dir", "User")
