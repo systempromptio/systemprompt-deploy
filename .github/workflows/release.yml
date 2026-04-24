@@ -191,12 +191,22 @@ jobs:
 
       - name: Compute SHA256SUMS.gateway (gateway assets only)
         working-directory: dist
+        shell: bash
         run: |
           # Gateway-only glob. This workflow does not produce cowork assets.
-          ( for f in systemprompt-gateway-*.tar.gz systemprompt-gateway_*.deb systemprompt-gateway-*.rpm; do
-              [ -f "$f" ] && sha256sum "$f"
-            done ) > SHA256SUMS.gateway
+          # nullglob + the if-guard avoid `set -e` killing the step when deb/rpm
+          # globs have no matches (they're optional — build-packages isn't
+          # required for sign-and-release).
+          shopt -s nullglob
+          ls -la
+          : > SHA256SUMS.gateway
+          for f in systemprompt-gateway-*.tar.gz systemprompt-gateway_*.deb systemprompt-gateway-*.rpm; do
+            if [ -f "$f" ]; then
+              sha256sum "$f" >> SHA256SUMS.gateway
+            fi
+          done
           cat SHA256SUMS.gateway
+          [ -s SHA256SUMS.gateway ] || { echo "SHA256SUMS.gateway is empty — no gateway artefacts found"; exit 1; }
 
       - uses: sigstore/cosign-installer@v3
 
