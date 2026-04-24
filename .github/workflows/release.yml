@@ -1,4 +1,12 @@
-name: Release
+name: Release (gateway server)
+
+# Publishes the systemprompt-gateway — the server-side AI governance gateway.
+# Triggered by `v*` tags on this deploy repo. Cross-uploads assets to the public
+# systemprompt-template GH Releases via RELEASE_UPLOAD_TOKEN.
+#
+# Cowork (client-side CLI for macOS/Windows) is a *separate* product. It is
+# published by the template repo's own release workflow on `cowork-v*` tags.
+# No cowork assets are produced by this workflow.
 
 on:
   push:
@@ -7,16 +15,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Template tag to (re)publish"
+        description: "Template tag to (re)publish (e.g. v0.3.5)"
         required: true
-      cowork_tag:
-        description: "systemprompt-core cowork release tag to bundle (Linux/Win/aarch64-mac)"
-        required: true
-        default: "v0.3.3"
-      cowork_mac_x64_tag:
-        description: "systemprompt-core cowork-mac release tag for Intel macOS zip"
-        required: true
-        default: "cowork-mac-v0.3.2"
 
 permissions:
   contents: write
@@ -50,11 +50,6 @@ jobs:
             os: macos-14
             use_cross: false
             ext: tar.gz
-          - target: x86_64-pc-windows-msvc
-            name: windows-amd64
-            os: windows-latest
-            use_cross: false
-            ext: zip
     steps:
       - uses: actions/checkout@v4
 
@@ -84,12 +79,10 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           [ "${{ github.event_name }}" = "workflow_dispatch" ] && version="${{ inputs.tag }}" && version="${version#v}"
-          stage="systemprompt-${version}-${{ matrix.name }}"
+          stage="systemprompt-gateway-${version}-${{ matrix.name }}"
           mkdir -p "dist/${stage}"
-          ext=""
-          [ "${{ matrix.name }}" = "windows-amd64" ] && ext=".exe"
           for b in systemprompt systemprompt-mcp-agent systemprompt-mcp-marketplace; do
-            cp "target/${{ matrix.target }}/release/${b}${ext}" "dist/${stage}/"
+            cp "target/${{ matrix.target }}/release/${b}" "dist/${stage}/"
           done
           cp -r services migrations "dist/${stage}/"
           [ -d web/dist ] && cp -r web/dist "dist/${stage}/web"
@@ -97,27 +90,19 @@ jobs:
           echo "STAGE=${stage}" >> "$GITHUB_ENV"
 
       - name: Package (tar.gz)
-        if: matrix.ext == 'tar.gz'
         shell: bash
         run: |
           cd dist
           tar -czf "${STAGE}.tar.gz" "${STAGE}"
 
-      - name: Package (zip)
-        if: matrix.ext == 'zip'
-        shell: pwsh
-        run: |
-          cd dist
-          Compress-Archive -Path $env:STAGE -DestinationPath "$env:STAGE.zip"
-
       - uses: actions/upload-artifact@v4
         with:
           name: gateway-${{ matrix.name }}
-          path: dist/${{ env.STAGE }}.${{ matrix.ext }}
+          path: dist/${{ env.STAGE }}.tar.gz
           if-no-files-found: error
 
   build-packages:
-    name: Build ${{ matrix.kind }} (${{ matrix.arch }})
+    name: Build gateway ${{ matrix.kind }} (${{ matrix.arch }})
     runs-on: ubuntu-latest
     needs: build-gateway
     strategy:
@@ -156,10 +141,12 @@ jobs:
           fi
       - name: Package
         run: |
+          version="${GITHUB_REF_NAME#v}"
+          [ "${{ github.event_name }}" = "workflow_dispatch" ] && version="${{ inputs.tag }}" && version="${version#v}"
           if [ "${{ matrix.kind }}" = "deb" ]; then
-            cargo deb --no-build --target ${{ matrix.target }} --output "dist/systemprompt_${{ matrix.arch }}.deb"
+            cargo deb --no-build --target ${{ matrix.target }} --output "dist/systemprompt-gateway_${version}_${{ matrix.arch }}.deb"
           else
-            cargo generate-rpm --target ${{ matrix.target }} --output "dist/systemprompt-${{ matrix.arch }}.rpm"
+            cargo generate-rpm --target ${{ matrix.target }} --output "dist/systemprompt-gateway-${version}-${{ matrix.arch }}.rpm"
           fi
       - uses: actions/upload-artifact@v4
         with:
@@ -167,13 +154,13 @@ jobs:
           path: dist/*
 
   sign-and-release:
-    name: Sign + Release
+    name: Sign + Release (gateway)
     runs-on: ubuntu-latest
     needs: [build-gateway, build-packages]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Resolve tags
+      - name: Resolve tag
         id: tags
         run: |
           if [ -n "${{ inputs.tag }}" ]; then
@@ -181,41 +168,24 @@ jobs:
           else
             echo "template_tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           fi
-          cowork_tag="${{ inputs.cowork_tag }}"
-          echo "cowork_tag=${cowork_tag:-v0.3.3}" >> "$GITHUB_OUTPUT"
-          mac_tag="${{ inputs.cowork_mac_x64_tag }}"
-          echo "cowork_mac_x64_tag=${mac_tag:-cowork-mac-v0.3.2}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
 
-      - name: Download cowork artefacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download "${{ steps.tags.outputs.cowork_tag }}" \
-            --repo systempromptio/systemprompt-core \
-            --dir dist \
-            --pattern 'systemprompt-cowork-*' \
-            --pattern 'SHA256SUMS*' || true
-          gh release download "${{ steps.tags.outputs.cowork_mac_x64_tag }}" \
-            --repo systempromptio/systemprompt-core \
-            --dir dist \
-            --pattern 'systemprompt-cowork-macos-x64*' || echo "no macOS x64 zip"
-
-      - name: Compute SHA256SUMS (gateway + packages)
+      - name: Compute SHA256SUMS.gateway (gateway assets only)
         working-directory: dist
         run: |
-          ( for f in systemprompt-*-*.tar.gz systemprompt-*-*.zip systemprompt_*.deb systemprompt-*.rpm; do
+          # Gateway-only glob. This workflow does not produce cowork assets.
+          ( for f in systemprompt-gateway-*.tar.gz systemprompt-gateway_*.deb systemprompt-gateway-*.rpm; do
               [ -f "$f" ] && sha256sum "$f"
             done ) > SHA256SUMS.gateway
           cat SHA256SUMS.gateway
 
       - uses: sigstore/cosign-installer@v3
 
-      - name: Sign SHA256SUMS (keyless)
+      - name: Sign SHA256SUMS.gateway (keyless)
         working-directory: dist
         env:
           COSIGN_EXPERIMENTAL: "1"
@@ -227,39 +197,46 @@ jobs:
 
       - name: Generate release notes
         run: |
-          cat > notes.md <<EOF
-          systemprompt ${{ steps.tags.outputs.template_tag }}
+          cat > notes.md <<'EOF'
+          # systemprompt-gateway ${{ steps.tags.outputs.template_tag }}
 
-          ## Gateway binaries
-          Multi-target tarballs / zips (linux amd64/arm64, darwin amd64/arm64, windows amd64).
-          Contents: \`systemprompt\`, \`systemprompt-mcp-agent\`, \`systemprompt-mcp-marketplace\`, \`services/\`, \`migrations/\`, \`web/\`.
+          **Server-side AI governance gateway.** Deploy via Helm / GHCR / Docker / PaaS.
 
-          Install with:
+          > Looking for the **cowork** client CLI (for macOS / Windows developer
+          > workstations)? It ships under the separate `cowork-v*` tag series —
+          > see [latest cowork release](https://github.com/systempromptio/systemprompt-template/releases?q=cowork).
 
-          \`\`\`
+          ## Install
+
+          ```
           curl -sSL https://get.systemprompt.io | sh
-          \`\`\`
+          ```
 
-          Or manually: download the tarball, verify against \`SHA256SUMS.gateway\`, extract.
+          Or manually: download the matching `systemprompt-gateway-<version>-<target>.tar.gz`
+          tarball, verify against `SHA256SUMS.gateway`, extract.
 
-          Verify the SHA256SUMS signature (cosign keyless):
+          ## Gateway binaries (this release)
 
-          \`\`\`
-          cosign verify-blob \\
-            --certificate-identity-regexp='https://github.com/systempromptio/systemprompt-template/' \\
-            --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \\
-            --signature SHA256SUMS.gateway.sig \\
-            --certificate SHA256SUMS.gateway.pem \\
-            SHA256SUMS.gateway
-          \`\`\`
+          Multi-target tarballs: `linux-amd64`, `linux-arm64`, `darwin-amd64`, `darwin-arm64`.
+
+          Contents: `systemprompt`, `systemprompt-mcp-agent`, `systemprompt-mcp-marketplace`,
+          `services/`, `migrations/`, `web/`.
 
           ## Linux packages
-          - \`systemprompt_amd64.deb\`, \`systemprompt_arm64.deb\` — see [docs/install/apt.md](docs/install/apt.md)
-          - \`systemprompt-x86_64.rpm\`, \`systemprompt-aarch64.rpm\` — see [docs/install/rpm.md](docs/install/rpm.md)
 
-          ## Cowork bundle
-          Bundles cowork binaries from systemprompt-core [${{ steps.tags.outputs.cowork_tag }}](https://github.com/systempromptio/systemprompt-core/releases/tag/${{ steps.tags.outputs.cowork_tag }})
-          and macOS x86_64 zip from [${{ steps.tags.outputs.cowork_mac_x64_tag }}](https://github.com/systempromptio/systemprompt-core/releases/tag/${{ steps.tags.outputs.cowork_mac_x64_tag }}).
+          - `systemprompt-gateway_<ver>_amd64.deb` / `systemprompt-gateway_<ver>_arm64.deb`
+          - `systemprompt-gateway-<ver>-x86_64.rpm` / `systemprompt-gateway-<ver>-aarch64.rpm`
+
+          ## Verify signature
+
+          ```
+          cosign verify-blob \
+            --certificate-identity-regexp='https://github.com/systempromptio/systemprompt-deploy/' \
+            --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \
+            --signature SHA256SUMS.gateway.sig \
+            --certificate SHA256SUMS.gateway.pem \
+            SHA256SUMS.gateway
+          ```
           EOF
 
       - name: Create or update release on PUBLIC systemprompt-template repo
@@ -268,12 +245,13 @@ jobs:
         run: |
           tag="${{ steps.tags.outputs.template_tag }}"
           target="systempromptio/systemprompt-template"
+          title="systemprompt-gateway $tag"
           if gh release view "$tag" --repo "$target" >/dev/null 2>&1; then
-            gh release edit "$tag" --repo "$target" --notes-file notes.md
+            gh release edit "$tag" --repo "$target" --title "$title" --notes-file notes.md
           else
             gh release create "$tag" \
               --repo "$target" \
-              --title "systemprompt $tag" \
+              --title "$title" \
               --notes-file notes.md
           fi
           gh release upload "$tag" --repo "$target" --clobber dist/*
