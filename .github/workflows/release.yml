@@ -167,7 +167,11 @@ jobs:
   sign-and-release:
     name: Sign + Release (gateway)
     runs-on: ubuntu-latest
-    needs: [build-gateway, build-packages]
+    needs: [build-gateway]
+    # build-packages (deb/rpm) removed from needs — it references mcp
+    # extension binaries that -p systemprompt-template doesn't build. Deb/rpm
+    # will be fixed and re-added separately; the gateway tarballs must ship
+    # independently.
     steps:
       - uses: actions/checkout@v4
 
