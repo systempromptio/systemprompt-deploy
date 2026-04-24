@@ -40,8 +40,8 @@ Pick the channel that matches your environment — each links to a copy-paste re
 
 | | Channel | Command |
 |---|---|---|
-| 🐳 | [Docker Hub](docs/install/docker.md) | `docker run systemprompt/gateway` |
 | 🐙 | [GHCR](docs/install/ghcr.md) | `docker run ghcr.io/systempromptio/systemprompt-template` |
+| 🐳 | [Docker Hub](docs/install/docker.md) *(soon)* | *coming — use GHCR today* |
 | 📦 | [Binary](docs/install/binary.md) | `curl -sSL https://get.systemprompt.io \| sh` |
 | 🍺 | [Homebrew](docs/install/homebrew.md) | `brew install systempromptio/tap/gateway` |
 | 🪣 | [Scoop](docs/install/scoop.md) | `scoop install systemprompt/gateway` |

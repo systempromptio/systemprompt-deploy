@@ -25,6 +25,7 @@ jobs:
   docker-hub:
     needs: version
     runs-on: ubuntu-latest
+    if: ${{ vars.DOCKERHUB_ENABLED == 'true' }}
     steps:
       - run: |
           docker pull systemprompt/gateway:${{ needs.version.outputs.version }}

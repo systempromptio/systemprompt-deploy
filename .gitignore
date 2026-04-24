@@ -171,3 +171,4 @@ demo/.token
 
 # Stray Outlook image paste artifacts
 /image*.png
+/.claude/

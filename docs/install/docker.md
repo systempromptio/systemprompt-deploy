@@ -1,8 +1,17 @@
 # Install via Docker Hub
 
-`systemprompt` is published to Docker Hub as [`systemprompt/gateway`](https://hub.docker.com/r/systemprompt/gateway) — multi-arch (`linux/amd64`, `linux/arm64`), cosign-signed, SBOM-attested.
+> **Status: not yet published.** Docker Hub requires a paid Team subscription to create an organization, so `docker.io/systemprompt/gateway` is pending.
+>
+> **Use [GHCR](ghcr.md) instead** — same image, same signing, no pull-rate limits:
+> ```bash
+> docker run --rm -p 8080:8080 ghcr.io/systempromptio/systemprompt-template:latest
+> ```
 
-## Quickstart
+---
+
+Once `systemprompt/gateway` is live on Docker Hub, the below will apply.
+
+## Quickstart (future state)
 
 ```bash
 docker run --rm -p 8080:8080 \
@@ -29,7 +38,7 @@ services:
       retries: 10
 
   gateway:
-    image: systemprompt/gateway:latest
+    image: ghcr.io/systempromptio/systemprompt-template:latest   # swap to systemprompt/gateway when live
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,6 +62,8 @@ Pin to an exact version in production.
 
 ## Verify signature
 
+Once live, images are cosign-signed (keyless OIDC):
+
 ```bash
 cosign verify \
   --certificate-identity-regexp='https://github.com/systempromptio/systemprompt-template/' \
@@ -60,11 +71,7 @@ cosign verify \
   systemprompt/gateway:0.2.2
 ```
 
-View the attached SBOM:
-
-```bash
-cosign download attestation systemprompt/gateway:0.2.2 | jq -r '.payload | @base64d | fromjson | .predicate'
-```
+Same command works today against GHCR — just swap the image ref.
 
 ## Environment variables
 
@@ -80,6 +87,7 @@ cosign download attestation systemprompt/gateway:0.2.2 | jq -r '.payload | @base
 
 ## Links
 
+- **Use GHCR today**: [install/ghcr.md](ghcr.md)
 - Source: https://github.com/systempromptio/systemprompt-template
 - Docs: https://systemprompt.io/documentation/?utm_source=dockerhub&utm_medium=install_doc
 - Licence: `MIT AND BUSL-1.1` — template code is [MIT](https://github.com/systempromptio/systemprompt-template/blob/main/LICENSE); the compiled binary links `systemprompt-core` which is [BSL-1.1](https://github.com/systempromptio/systemprompt-core/blob/main/LICENSE) (converts to Apache 2.0 after 4 years; production use of the compiled image requires a commercial core licence).
