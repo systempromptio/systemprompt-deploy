@@ -75,6 +75,11 @@ jobs:
 
       - uses: azure/setup-helm@v4
 
+      - name: Update chart dependencies (bitnami postgresql subchart)
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency update helm/gateway
+
       - name: Release chart to systempromptio/charts
         uses: helm/chart-releaser-action@v1.6.0
         env:
