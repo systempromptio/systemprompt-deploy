@@ -3,7 +3,7 @@ name: gateway
 description: The governance layer for AI agents — a single compiled Rust binary that authenticates, authorises, rate-limits, logs, and costs every AI interaction. Self-hosted, air-gap capable, provider-agnostic.
 type: application
 version: 0.1.0
-appVersion: "0.3.2"
+appVersion: "0.3.3"
 kubeVersion: ">=1.24.0"
 home: https://systemprompt.io
 icon: https://systemprompt.io/files/images/logo.svg
