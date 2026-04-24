@@ -33,13 +33,6 @@ spec:
               value: "0.0.0.0"
             - name: PORT
               value: "8080"
-            {{- if .Values.postgresql.enabled }}
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-postgresql
-                  key: password
-            {{- end }}
             - name: DATABASE_URL
               value: {{ include "gateway.databaseUrl" . | quote }}
             - name: ANTHROPIC_API_KEY

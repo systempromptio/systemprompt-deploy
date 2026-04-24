@@ -51,9 +51,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "gateway.databaseUrl" -}}
-{{- if .Values.postgresql.enabled -}}
-{{- printf "postgres://%s:$(POSTGRES_PASSWORD)@%s-postgresql:5432/%s" .Values.postgresql.auth.username .Release.Name .Values.postgresql.auth.database -}}
-{{- else -}}
-{{- required "externalDatabase.url is required when postgresql.enabled=false" .Values.externalDatabase.url -}}
-{{- end -}}
+{{- required "externalDatabase.url is required — point the gateway at any reachable Postgres 13+" .Values.externalDatabase.url -}}
 {{- end -}}

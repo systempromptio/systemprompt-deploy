@@ -40,17 +40,23 @@ secrets:
   openaiApiKey: ""
   geminiApiKey: ""
 
-# Bitnami PostgreSQL subchart. Set enabled=false and configure externalDatabase
-# to use an existing Postgres.
-postgresql:
-  enabled: true
-  auth:
-    username: systemprompt
-    password: ""       # auto-generated if empty
-    database: systemprompt
-  primary:
-    persistence:
-      size: 10Gi
+# External Postgres connection. The gateway is stateless; it expects a
+# reachable Postgres ≥13 via DATABASE_URL.
+#
+# For quick demos, install bitnami/postgresql separately:
+#   helm repo add bitnami https://charts.bitnami.com/bitnami
+#   helm install demo-pg bitnami/postgresql --set auth.database=systemprompt \
+#     --set auth.username=systemprompt --set auth.password=demo
+#   export DATABASE_URL="postgres://systemprompt:demo@demo-pg-postgresql:5432/systemprompt"
+externalDatabase:
+  # Full Postgres URL. Overrides host/port/user/password/database fields.
+  url: ""
+  host: ""
+  port: 5432
+  username: systemprompt
+  database: systemprompt
+  # Populate via existingSecret key=DATABASE_URL (recommended) or password field below.
+  password: ""
 
 externalDatabase:
   url: ""   # e.g. postgres://user:pw@host:5432/dbname — required when postgresql.enabled=false
