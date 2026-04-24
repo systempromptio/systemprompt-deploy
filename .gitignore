@@ -1,3 +1,6 @@
+# Internal docs (strategy, plans, QA playbooks) — kept local, not published
+/docs-internal/
+
 # Rust build artifacts
 /target/
 **/target/

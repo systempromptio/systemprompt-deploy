@@ -34,7 +34,38 @@ Got your AI governance question answered? [⭐ Star it](https://github.com/syste
 
 ---
 
-## Quick start
+## Install
+
+Pick the channel that matches your environment — each links to a copy-paste recipe in [`docs/install/`](docs/install):
+
+| | Channel | Command |
+|---|---|---|
+| 🐳 | [Docker Hub](docs/install/docker.md) | `docker run systemprompt/gateway` |
+| 🐙 | [GHCR](docs/install/ghcr.md) | `docker run ghcr.io/systempromptio/systemprompt-template` |
+| 📦 | [Binary](docs/install/binary.md) | `curl -sSL https://get.systemprompt.io \| sh` |
+| 🍺 | [Homebrew](docs/install/homebrew.md) | `brew install systempromptio/tap/gateway` |
+| 🪣 | [Scoop](docs/install/scoop.md) | `scoop install systemprompt/gateway` |
+| ☸️  | [Helm](docs/install/helm.md) | `helm install gateway systemprompt/gateway` |
+| 🐧 | [APT](docs/install/apt.md) | `apt install systemprompt` |
+| 🎩 | [RPM](docs/install/rpm.md) | `dnf install systemprompt` |
+| 🪟 | [Winget](docs/install/winget.md) | `winget install systemprompt.gateway` |
+| ❄️  | [Nix](docs/install/nix.md) | `nix run github:systempromptio/systemprompt-template` |
+| 🚂 | [Railway](docs/install/railway.md) | One-click deploy |
+| 🎨 | [Render](docs/install/render.md) | One-click blueprint |
+| 🛟 | [Coolify](docs/install/coolify.md) | Community template |
+
+## Quick start (Docker Compose — dev / evaluation)
+
+```bash
+git clone https://github.com/systempromptio/systemprompt-template
+cd systemprompt-template
+cp .env.example .env                                     # fill in ANTHROPIC_API_KEY (or OPENAI / GEMINI)
+docker compose up                                        # Postgres + migrations + server on http://localhost:8080
+```
+
+First build compiles the Rust workspace (~8 min); subsequent `docker compose up` starts in seconds.
+
+### Build from source (for contributors)
 
 ```bash
 just build                                               # 1. compile the workspace
