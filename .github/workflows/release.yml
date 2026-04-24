@@ -65,6 +65,15 @@ jobs:
         if: matrix.use_cross
         env:
           SQLX_OFFLINE: "true"
+          # Force C compiler to clang inside the cross container. Focal's gcc 9
+          # trips aws-lc-sys's false-positive for gcc bug 95189. Cross.toml has
+          # these in build.env.passthrough so they make it into the container.
+          CC: clang
+          CXX: clang++
+          CC_x86_64_unknown_linux_gnu: clang
+          CC_aarch64_unknown_linux_gnu: clang
+          CXX_x86_64_unknown_linux_gnu: clang++
+          CXX_aarch64_unknown_linux_gnu: clang++
         run: cross build --release --workspace --target ${{ matrix.target }}
 
       - name: Build (native)
@@ -131,6 +140,12 @@ jobs:
       - name: Build release binary
         env:
           SQLX_OFFLINE: "true"
+          CC: clang
+          CXX: clang++
+          CC_x86_64_unknown_linux_gnu: clang
+          CC_aarch64_unknown_linux_gnu: clang
+          CXX_x86_64_unknown_linux_gnu: clang++
+          CXX_aarch64_unknown_linux_gnu: clang++
         run: cross build --release -p systemprompt-template --target ${{ matrix.target }}
       - name: Install packager
         run: |
