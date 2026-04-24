@@ -40,9 +40,10 @@ jobs:
         if: github.event_name != 'release'
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm dependency update helm/gateway
+          helm dependency build helm/gateway || helm dependency update helm/gateway
           ls -la helm/gateway/charts/
           helm install gateway helm/gateway \
+            --dependency-update \
             --set postgresql.auth.password=testpw \
             --set secrets.anthropicApiKey=dummy \
             --wait --timeout 300s
