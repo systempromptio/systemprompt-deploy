@@ -10,10 +10,10 @@
 [build.env]
 passthrough = [
     "SQLX_OFFLINE",
-    "CC",
-    "CXX",
+    "HOST_CC",
+    "HOST_CXX",
     "CC_x86_64_unknown_linux_gnu",
-    "CC_aarch64_unknown_linux_gnu",
+    "CXX_x86_64_unknown_linux_gnu",
 ]
 
 [target.x86_64-unknown-linux-gnu]
