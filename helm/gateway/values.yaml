@@ -49,17 +49,16 @@ secrets:
 #     --set auth.username=systemprompt --set auth.password=demo
 #   export DATABASE_URL="postgres://systemprompt:demo@demo-pg-postgresql:5432/systemprompt"
 externalDatabase:
-  # Full Postgres URL. Overrides host/port/user/password/database fields.
+  # Full Postgres URL — REQUIRED. e.g. postgres://user:pw@host:5432/dbname
+  # Populate via existingSecret key=DATABASE_URL (recommended for prod) or
+  # plaintext here for dev.
   url: ""
+  # Optional field-level overrides (ignored if url is set)
   host: ""
   port: 5432
   username: systemprompt
   database: systemprompt
-  # Populate via existingSecret key=DATABASE_URL (recommended) or password field below.
   password: ""
-
-externalDatabase:
-  url: ""   # e.g. postgres://user:pw@host:5432/dbname — required when postgresql.enabled=false
 
 env: []     # additional env vars: { name: FOO, value: bar }
 
