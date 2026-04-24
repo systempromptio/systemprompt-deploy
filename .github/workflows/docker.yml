@@ -50,12 +50,16 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR
+      # Cross-repo push: publish to ghcr.io/systempromptio/systemprompt-template
+      # from this private systemprompt-deploy repo. The default GITHUB_TOKEN only
+      # has write access to packages matching this repo's name — so we need a PAT
+      # with `write:packages` scope on the systempromptio org.
+      - name: Log in to GHCR (cross-repo PAT)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
 
       - name: Build and push
         id: build

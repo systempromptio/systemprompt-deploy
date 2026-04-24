@@ -262,16 +262,18 @@ jobs:
           and macOS x86_64 zip from [${{ steps.tags.outputs.cowork_mac_x64_tag }}](https://github.com/systempromptio/systemprompt-core/releases/tag/${{ steps.tags.outputs.cowork_mac_x64_tag }}).
           EOF
 
-      - name: Create or update release
+      - name: Create or update release on PUBLIC systemprompt-template repo
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_UPLOAD_TOKEN }}
         run: |
           tag="${{ steps.tags.outputs.template_tag }}"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release edit "$tag" --notes-file notes.md
+          target="systempromptio/systemprompt-template"
+          if gh release view "$tag" --repo "$target" >/dev/null 2>&1; then
+            gh release edit "$tag" --repo "$target" --notes-file notes.md
           else
             gh release create "$tag" \
+              --repo "$target" \
               --title "systemprompt $tag" \
               --notes-file notes.md
           fi
-          gh release upload "$tag" --clobber dist/*
+          gh release upload "$tag" --repo "$target" --clobber dist/*
