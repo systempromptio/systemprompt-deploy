@@ -40,11 +40,9 @@ jobs:
             os: ubuntu-latest
             use_cross: true
             ext: tar.gz
-          - target: x86_64-apple-darwin
-            name: darwin-amd64
-            os: macos-13
-            use_cross: false
-            ext: tar.gz
+          # x86_64-apple-darwin temporarily removed — macos-13 runner queue was
+          # 7h+ on v0.3.8 and never allocated. Re-add once Apple-silicon is the
+          # only sensible Mac target, or once GH macOS capacity improves.
           - target: aarch64-apple-darwin
             name: darwin-arm64
             os: macos-14
