@@ -81,7 +81,7 @@ jobs:
           helm dependency update helm/gateway
 
       - name: Release chart to systempromptio/charts
-        uses: helm/chart-releaser-action@v1.8.1
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: ${{ secrets.CHARTS_REPO_TOKEN }}
         with:
