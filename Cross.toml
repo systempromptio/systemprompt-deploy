@@ -1,0 +1,9 @@
+# cross-rs configuration for release builds.
+# .cargo/config.toml pins linker=clang + rustflags for mold — install both
+# in the cross container before compiling.
+
+[target.x86_64-unknown-linux-gnu]
+pre-build = ["apt-get update && apt-get install --assume-yes clang mold"]
+
+[target.aarch64-unknown-linux-gnu]
+pre-build = ["apt-get update && apt-get install --assume-yes clang mold"]
