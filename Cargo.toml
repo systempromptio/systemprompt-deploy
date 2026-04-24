@@ -220,6 +220,12 @@ systemprompt = { workspace = true, features = ["full"] }
 # Local extensions
 systemprompt-web-extension = { workspace = true }
 
+# Vendored OpenSSL for cross-compile CI (webauthn-attestation-ca demands
+# OpenSSL 3.0+; cross-rs Ubuntu 20.04 images ship 1.1.1). `features = ["vendored"]`
+# is additive across the whole dep graph — satisfies the transitive openssl-sys
+# requirement without touching the core crate.
+openssl = { version = "0.10", features = ["vendored"] }
+
 # Runtime
 tokio = { workspace = true }
 tracing = { workspace = true }
