@@ -81,9 +81,15 @@ jobs:
           helm dependency update helm/gateway
 
       - name: Release chart to systempromptio/charts
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.8.1
         env:
           CR_TOKEN: ${{ secrets.CHARTS_REPO_TOKEN }}
         with:
           charts_dir: helm
           config: helm/cr.yaml
+          skip_existing: true
+          # v1.8+ respects cr.yaml's owner/git-repo for the release-creation
+          # target. Previously the action hardcoded GITHUB_REPOSITORY, which
+          # made the release creation try to write to systemprompt-deploy
+          # instead of systempromptio/charts — and the CR_TOKEN PAT is scoped
+          # only to charts.
