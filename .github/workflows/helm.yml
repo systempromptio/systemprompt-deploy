@@ -75,21 +75,31 @@ jobs:
 
       - uses: azure/setup-helm@v4
 
-      - name: Update chart dependencies (bitnami postgresql subchart)
+      - name: Package chart
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm dependency update helm/gateway
+          mkdir -p dist
+          helm package helm/gateway --destination dist/
+          ls -la dist/
 
-      - name: Release chart to systempromptio/charts
-        uses: helm/chart-releaser-action@v1.7.0
+      - name: Publish chart to systempromptio/charts gh-pages
         env:
-          CR_TOKEN: ${{ secrets.CHARTS_REPO_TOKEN }}
-        with:
-          charts_dir: helm
-          config: helm/cr.yaml
-          skip_existing: true
-          # v1.8+ respects cr.yaml's owner/git-repo for the release-creation
-          # target. Previously the action hardcoded GITHUB_REPOSITORY, which
-          # made the release creation try to write to systemprompt-deploy
-          # instead of systempromptio/charts — and the CR_TOKEN PAT is scoped
-          # only to charts.
+          GH_TOKEN: ${{ secrets.CHARTS_REPO_TOKEN }}
+        run: |
+          set -e
+          # Clone the charts repo's gh-pages branch
+          git clone --branch gh-pages --depth 1 \
+            "https://x-access-token:${GH_TOKEN}@github.com/systempromptio/charts.git" \
+            /tmp/charts
+          cp dist/*.tgz /tmp/charts/
+          cd /tmp/charts
+          # Regenerate index.yaml including the new .tgz plus all pre-existing ones
+          helm repo index . --url https://charts.systemprompt.io
+          git config user.name  "systemprompt-bot"
+          git config user.email "bot@systemprompt.io"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Chart already at current version — nothing to commit"
+          else
+            git commit -m "Publish gateway chart $(ls gateway-*.tgz | tail -1 | sed -E 's/.*-([0-9.]+)\.tgz/v\1/')"
+            git push origin gh-pages
+          fi
