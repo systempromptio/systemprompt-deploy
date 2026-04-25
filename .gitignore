@@ -5,7 +5,7 @@
 /target/
 **/target/
 **/*.rs.bk
-Cargo.lock
+# Cargo.lock committed (binary crate convention) — see template repo for rationale
 
 # Generated files and assets
 /files/
