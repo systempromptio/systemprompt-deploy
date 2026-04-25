@@ -92,7 +92,23 @@ jobs:
             cp "target/${{ matrix.target }}/release/${b}" "dist/${stage}/"
           done
           cp -r services migrations "dist/${stage}/"
-          [ -d web/dist ] && cp -r web/dist "dist/${stage}/web"
+          # MCP extension manifests — services/mcp/*.yaml references
+          # extensions/mcp/<name>/manifest.yaml. Without these, MCP startup
+          # validation fails out of the gate. (A3 finding, 2026-04-25.)
+          mkdir -p "dist/${stage}/extensions/mcp"
+          for ext in extensions/mcp/*/; do
+            name=$(basename "${ext}")
+            if [ -f "${ext}/manifest.yaml" ]; then
+              mkdir -p "dist/${stage}/extensions/mcp/${name}"
+              cp "${ext}/manifest.yaml" "dist/${stage}/extensions/mcp/${name}/"
+            fi
+          done
+          # Runtime data dir (empty but required to exist on first boot)
+          mkdir -p "dist/${stage}/storage"
+          # Web assets — copy if pre-built, otherwise leave dir empty so the
+          # binary can write SSR templates at runtime
+          mkdir -p "dist/${stage}/web"
+          [ -d web/dist ] && cp -r web/dist/* "dist/${stage}/web/" || true
           cp LICENSE README.md "dist/${stage}/"
           echo "STAGE=${stage}" >> "$GITHUB_ENV"
 
