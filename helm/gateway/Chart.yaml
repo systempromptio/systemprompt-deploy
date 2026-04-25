@@ -36,9 +36,9 @@ annotations:
   artifacthub.io/prerelease: "false"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/operator: "false"
-  artifacthub.io/signKey: |
-    fingerprint: TODO-replace-with-cosign-key-fingerprint
-    url: https://systemprompt.io/.well-known/cosign.pub
+  # signKey omitted — chart-releaser cr.yaml has sign: false (no GPG/cosign
+  # keypair provisioned yet). Re-add this annotation with a real fingerprint
+  # + pubkey URL once chart signing is enabled.
   artifacthub.io/links: |
     - name: Website
       url: https://systemprompt.io
