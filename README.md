@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **This repository is archived (2026-07-16).** All release, Docker, Helm, and
+> packaging pipelines moved to
+> [systempromptio/systemprompt-template](https://github.com/systempromptio/systemprompt-template),
+> which builds from the released tag itself. This repo remains read-only so that
+> cosign certificates on pre-v0.5.0 releases (signed under this repo's identity)
+> stay verifiable.
+
 # systemprompt-deploy (private)
 
 Production distribution pipelines for systemprompt.io.
