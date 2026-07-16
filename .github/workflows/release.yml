@@ -8,10 +8,12 @@ name: Release (gateway server)
 # published by the template repo's own release workflow on `cowork-v*` tags.
 # No cowork assets are produced by this workflow.
 
+# RETIRED (2026-07-16): gateway releases now build in
+# systempromptio/systemprompt-template (.github/workflows/release-gateway.yml)
+# from the tag being released, so assets always match the source. This copy is
+# kept dispatch-only for emergency re-publishes of old tags; do not re-enable
+# the tag trigger or the two pipelines will dual-publish.
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       tag:
